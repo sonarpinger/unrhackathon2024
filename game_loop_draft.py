@@ -79,6 +79,7 @@ model = YOLO("yolov8n-pose.pt")
 
 camera_stuff = init_camera()
 cap = camera_stuff["cap"]
+window_caption = "Dance Planet"
 
 body = init_body()
 
@@ -110,7 +111,8 @@ while cap.isOpened():
 
     # Display the resulting frame
     caption = "Get in position!"
-    cv2.imshow(caption, frame)
+    cv2.putText(frame, caption, (50, 100), font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
+    cv2.imshow(window_caption, frame)
 
     # Break the loop with 'Q' key
     if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -141,10 +143,19 @@ while cap.isOpened():
 
     # display on screen
     caption = f"Error: {error}"
-    cv2.imshow(caption, video_frames[frame_counter])
+    source_frame = video_frames[frame_counter]
+    cv2.putText(source_frame, caption, (50, 100), font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
+    cv2.imshow(window_caption, source_frame)
+
+    #increment
+    frame_counter += 1
+
+    # end if frame_counter reaches end
+    if frame_counter == video_frames_right_bound + 1:
+        break
 
     # break loop if q
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(10) & 0xFF == ord('q'):
         break
 
 # When everything is done, release the capture
