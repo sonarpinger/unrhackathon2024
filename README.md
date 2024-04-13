@@ -39,15 +39,15 @@ python -m pip install pyside6
 
 - [x] Start on GUI
 
-- [ ] Output Keypoints Over Time
+- [x] Output Keypoints Over Time
 
 - [ ] Compare Live Keypoints to Basis Keypoints
 
 - [ ] Create Basis Keypoint Comparisons for Multiple Dances
 
-- [ ] Create Basic Error Function
+- [x] Create Basic Error Function
 
-- [ ] Create Temporal Error Function
+- [x] Create Temporal Error Function
 
 - [ ] Create Score Function
 
