@@ -32,9 +32,9 @@ python -m pip install ultralytics
 
 - [x] Output Bounding Box
 
-- [ ] Output Limb Vectors
+- [x] Output Limb Vectors
 
-- [ ] Normalize Limb Vectors and Bounding Box
+- [x] Normalize Limb Vectors and Bounding Box
 
 - [ ] Start on GUI
 
