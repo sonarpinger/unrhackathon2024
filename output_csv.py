@@ -58,14 +58,14 @@ def main(args):
   # right_leg = [11, 13]
   # body = [right_arm, left_arm, right_leg, left_leg]
 
-  right_upper_arm = [6, 8]
-  right_forearm = [8, 10]
-  left_upper_arm = [7, 9]
-  left_forearm = [9, 11]
-  right_quad = [12, 14]
-  right_calf = [14, 16]
-  left_quad = [13, 15]
-  left_calf = [15, 17]
+  right_upper_arm = [5, 7]
+  right_forearm = [7, 9]
+  left_upper_arm = [6, 8]
+  left_forearm = [8, 10]
+  right_quad = [11, 13]
+  right_calf = [13, 15]
+  left_quad = [12, 14]
+  left_calf = [14, 16]
   body = [right_upper_arm, right_forearm, left_upper_arm, left_forearm, right_quad, right_calf, left_quad, left_calf]
 
   print("going into try block")
