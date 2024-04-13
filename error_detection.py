@@ -5,12 +5,14 @@
 
 import numpy as np
 
-def limb_delta(limb_truth : list, limb_test : list) -> float:
+def limb_delta(limb_truth : list, limb_test : list, threshold : int = 0, ratio : float = 1.0) -> float:
     """
     Takes two limbs, each of structure [[x1, y1], [x2, y2]], and calculates the difference between them
     """
     _difference = [
-        [abs(limb_truth[i][j] - limb_test[i][j]) for j in range(len(limb_truth[i]))] for i in range(len(limb_test))
+        [ratio * abs(limb_truth[i][j] - limb_test[i][j]) if abs(limb_truth[i][j] - limb_test[i][j]) > threshold else 0
+         for j in range(len(limb_truth[i]))] 
+        for i in range(len(limb_test))
     ]
     difference = sum(sum(inner_list) for inner_list in _difference) # add each difference between the keypoints
     return difference
@@ -26,16 +28,17 @@ def delta_linear_scalar(difference : float) -> float:
     return scaled_dif
 
 
-def get_difference(limb_truth : list, limb_test : list) -> float:
+def get_difference(limb_truth : list, limb_test : list, threshold : int = 0, ratio : float = 1.0) -> float:
     """
     performs all the calcs needed to get a difference between two limbs
     """
-    simple_dif = limb_delta(limb_truth, limb_test)
-    scaled_dif = delta_linear_scalar(simple_dif)
+    simple_dif = limb_delta(limb_truth, limb_test, threshold, ratio)
+    # scaled_dif = delta_linear_scalar(simple_dif)
+    scaled_dif = simple_dif
     return scaled_dif
 
 
-def simple_pose_error(body_truth : list, body_test : list) -> float:
+def simple_pose_error(body_truth : list, body_test : list, threshold : int = 0, ratio : float = 1.0) -> float:
     """
     A simple error function that takes the total difference between two body lists, 
     where each entry i in both lists correspond to a specific limb vector of structure [[x1, y1], [x2, y2]]
@@ -43,11 +46,11 @@ def simple_pose_error(body_truth : list, body_test : list) -> float:
     error_sum = 0 # keep track of total error of all limbs
     for i, limb_truth in enumerate(body_truth):
         limb_test = body_test[i]
-        error = get_difference(limb_truth, limb_test) # get error for that limb
+        error = get_difference(limb_truth, limb_test, threshold, ratio) # get error for that limb
         error_sum += error # add
     return error_sum # return total sum of differences as an error
 
-def avg_temporal_pose_error(_body_truth : list, body_test : list) -> float:
+def avg_temporal_pose_error(_body_truth : list, body_test : list, threshold : int = 0, ratio : float = 1.0) -> float:
     """
     Takes an input body list (pose) and compares it to multiple frame source material and outputs the average
     Args:
@@ -59,13 +62,13 @@ def avg_temporal_pose_error(_body_truth : list, body_test : list) -> float:
     error_sum = 0
     counter = 0
     for body_truth in _body_truth:
-        error = simple_pose_error(body_truth, body_test)
+        error = simple_pose_error(body_truth, body_test, threshold, ratio)
         error_sum += error
         counter += 1
     error_avg = error_sum / counter
     return error_avg
 
-def min_temporal_pose_error(_body_truth : list, body_test : list) -> float:
+def min_temporal_pose_error(_body_truth : list, body_test : list, threshold : int = 0, ratio : float = 1.0) -> float:
     """
     Takes in input body list (pose) and compares it to multiple frame source material and outputs the min error 
     Args:
@@ -76,12 +79,12 @@ def min_temporal_pose_error(_body_truth : list, body_test : list) -> float:
     """
     min_error = 1000000000000000
     for body_truth in _body_truth:
-        error = simple_pose_error(body_truth, body_test)
+        error = simple_pose_error(body_truth, body_test, threshold, ratio)
         if error < min_error:
             min_error = error
     return min_error
 
-def max_temporal_pose_error(_body_truth : list, body_test : list) -> float:
+def max_temporal_pose_error(_body_truth : list, body_test : list, threshold : int = 0, ratio : float = 1.0) -> float:
     """
     Takes in input body list (pose) and compares it to multiple frame source material and outputs the max error
     Args:
@@ -92,7 +95,7 @@ def max_temporal_pose_error(_body_truth : list, body_test : list) -> float:
     """
     max_error = 0
     for body_truth in _body_truth:
-        error = simple_pose_error(body_truth, body_test)
+        error = simple_pose_error(body_truth, body_test, threshold, ratio)
         if error > max_error:
             max_error = error
     return max_error

@@ -112,6 +112,8 @@ def create_analytics(time, data):
     image = np.frombuffer(buf.getvalue(), dtype=np.uint8)
     image = cv2.imdecode(image, cv2.IMREAD_COLOR)
 
+    plt.close(fig)
+
     # return image
     return image
 
@@ -131,7 +133,7 @@ def add_limbs_to_frame(norm_body : list, norm_box : list, frame : np.array):
     for i, limb in enumerate(norm_body):
         if visibility[i]:
             start = [a + b for a,b in zip(limb[0], [norm_box[0], norm_box[1]])]
-            end = [a + b for a,b in zip(limb[0], [norm_box[0], norm_box[1]])]
+            end = [a + b for a,b in zip(limb[1], [norm_box[0], norm_box[1]])]
             cv2.line(frame, start, end, line_color, line_thickness)
             cv2.circle(frame, start, radius=circle_radius, color=circle_color, thickness=circle_thickness)
             cv2.circle(frame, end, radius=circle_radius, color=circle_color, thickness=circle_thickness)
@@ -141,10 +143,23 @@ def add_limbs_to_frame(norm_body : list, norm_box : list, frame : np.array):
     
     return frame
 
+def visibility_score(player_body : list) -> int:
+    visibility_count = 0
+    for limb in player_body:
+        if limb != [[0, 0], [0, 0]]:
+            visibility_count += 1
+    return visibility_count
+
+def body_printout(body):
+    print(f"right arm: {body[0]} || x_len : {body[0][1][0] - body[0][0][0]} || y_len: {body[0][1][1] - body[0][0][1]}")
+    print(f"left arm: {body[1]} || x_len : {body[1][1][0] - body[1][0][0]} || y_len: {body[1][1][1] - body[1][0][1]}")
+    print(f"right leg: {body[2]} || x_len : {body[2][1][0] - body[2][0][0]} || y_len: {body[2][1][1] - body[2][0][1]}")
+    print(f"left leg: {body[3]} || x_len : {body[3][1][0] - body[3][0][0]} || y_len: {body[3][1][1] - body[3][0][1]}")
+
 # init source csv, also get source video
-csv_fp = "./data/test_csvs/flossslow.csv"
+csv_fp = "./data/test_csvs/stand.csv"
 keys_df = dh.load_csv_from_file(csv_fp)
-video_fp = "./data/test_videos/flossslow.mp4"
+video_fp = "./data/test_videos/stand.mp4"
 video_frames = dh.load_video_from_file(video_fp) # can either load
 video_frames_right_bound = len(video_frames) - 1 # assumes keypoints df and video_frames are aligned (as they are from the same source material) keypoint csv capture is at 25 fps right now and video frame output is at 25 fps
 
@@ -156,15 +171,20 @@ window_caption = "Dance Planet"
 
 body = init_body()
 
+# error params
+threshold = 50
+ratio = 1
+
 # frame counter for aligning camera output with with source video, works bc both camera input and source vid input should be aligned fps
 frame_counter = 0
 
 # countdown init
 start_time = time.time()
 countdown = 3
+cd = True # enable countdown
 
 # display countdown
-while cap.isOpened():
+while cd and cap.isOpened():
     ret, frame = cap.read()
     if not ret:
         break
@@ -192,11 +212,14 @@ while cap.isOpened():
         break
 
 # for analytics
-analytics = False
+analytics = True
 error_over_time = []
 
 # limb view
 limb_view = True
+
+# data printout
+data_printout = False
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -207,19 +230,22 @@ while cap.isOpened():
     model_stuff = run_model(frame, model)
     # get normalized body list by using camera frame size, model output, and standard body limb setup
     norm_body = pk.body_normalize(camera_stuff, model_stuff, body)
+    # add horizontal flip of keypoints
+    norm_body = pk.horizontal_body_flip(camera_stuff, norm_body)
 
     # error calculation
     # setup temporal range
-    temporal_size = 1 # establishes a range of (n - temporal_size, n + temporal_size) working on frame n to calculate error on
+    temporal_size = 5 # establishes a range of (n - temporal_size, n + temporal_size) working on frame n to calculate error on
     temporal_left_bound = frame_counter - temporal_size if frame_counter - temporal_size >= 0 else 0
     temporal_right_bound = frame_counter + temporal_size if frame_counter + temporal_size <= video_frames_right_bound else video_frames_right_bound
     temporal_frame_range = [temporal_left_bound, temporal_right_bound]
+    current_source_body_index = (temporal_right_bound - temporal_left_bound) // 2
     # get source keypoints for comparison
     source_bodies_raw = dh.get_keypoints_from_df_range(keys_df, temporal_frame_range)
     # convert to usable keypoints
     source_bodies_usable = [dh.usable_keypoints(keys) for keys in source_bodies_raw]
     # get error
-    error = ed.min_temporal_pose_error(source_bodies_usable, norm_body)
+    error = ed.min_temporal_pose_error(source_bodies_usable, norm_body, threshold, ratio)
     error_over_time.append(error)
 
     # analytics screen
@@ -232,6 +258,7 @@ while cap.isOpened():
         # display
         analytics_caption = "error over time"
         cv2.imshow(analytics_caption, chart)
+        plt.close()
 
     # display on screen
     caption = f"Error: {error}"
@@ -239,11 +266,21 @@ while cap.isOpened():
 
     if limb_view:
         add_limbs_to_frame(norm_body, camera_stuff["norm_box_1"], source_frame)
-        current_source_body_index = len(source_bodies_usable) // 2
         add_limbs_to_frame(source_bodies_usable[current_source_body_index], camera_stuff["norm_box_2"], source_frame)
+        vis_caption = f"visibility score: {visibility_score(norm_body)}"
+        cv2.putText(source_frame, vis_caption, (200, 200), font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
     
     cv2.putText(source_frame, caption, (50, 100), font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
     cv2.imshow(window_caption, source_frame)
+
+    # data print out 
+    if data_printout:
+        print("norm_body : ")
+        body_printout(norm_body)
+        print("source_body : ")
+        body_printout(source_bodies_usable[current_source_body_index])
+        print(f"error : {error}")
+        break
 
     #increment
     frame_counter += 1
