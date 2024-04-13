@@ -37,8 +37,8 @@ def init_camera():
         (frame_width + norm_box_length) // 2, # right bound 
         (frame_height + norm_box_length) // 2, # top bound, or bototm boudn?
     ]
-    start_x = mid_height - norm_box_length
-    bottom_y = frame_height - norm_box_length
+    start_x = mid_width - norm_box_length
+    bottom_y = mid_height - norm_box_length
     norm_box_1 = [
         start_x - gap, # left
         bottom_y - gap, # bottom
@@ -172,8 +172,9 @@ window_caption = "Dance Planet"
 body = init_body()
 
 # error params
-threshold = 50
-ratio = 1
+threshold = 0
+above_ratio = 1.0
+below_ratio = 1.0
 
 # frame counter for aligning camera output with with source video, works bc both camera input and source vid input should be aligned fps
 frame_counter = 0
@@ -245,7 +246,7 @@ while cap.isOpened():
     # convert to usable keypoints
     source_bodies_usable = [dh.usable_keypoints(keys) for keys in source_bodies_raw]
     # get error
-    error = ed.min_temporal_pose_error(source_bodies_usable, norm_body, threshold, ratio)
+    error = ed.min_temporal_pose_error(source_bodies_usable, norm_body, threshold, above_ratio, below_ratio)
     error_over_time.append(error)
 
     # analytics screen
