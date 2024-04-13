@@ -8,14 +8,14 @@ import numpy as np
 
 FRAME_RATE = 25
 
-def load_image(image_fp : str) -> np.array:
+def load_image_from_file(image_fp : str) -> np.array:
     image = cv2.imread(image_fp)
     if image is not None:
         return image
     else:
         raise FileNotFoundError(f"No image found at {image_fp}")
 
-def load_video(video_fp : str) -> list:
+def load_video_from_file(video_fp : str) -> list:
     """
     takes in a filepath of a video and extracts the video frame by frame at the desired FRAME_RATE into a list of frames and returns the list of frames
     """
