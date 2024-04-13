@@ -69,9 +69,9 @@ def run_model(frame, model, args=None):
     return stuff 
 
 # init source csv, also get source video
-csv_fp = "./data/test_csvs/floss.csv"
+csv_fp = "./data/test_csvs/flossslow.csv"
 keys_df = dh.load_csv_from_file(csv_fp)
-video_fp = "./data/test_videos/floss.mp4"
+video_fp = "./data/test_videos/flossslow.mp4"
 video_frames = dh.load_video_from_file(video_fp) # can either load
 video_frames_right_bound = len(video_frames) - 1 # assumes keypoints df and video_frames are aligned (as they are from the same source material) keypoint csv capture is at 25 fps right now and video frame output is at 25 fps
 
