@@ -27,15 +27,35 @@ def init_camera():
 
     # normalization window
     norm_box_length = 250
-    norm_box = [
+    mid_width = frame_width // 2
+    mid_height = frame_height // 2
+    gap = 15
+
+    norm_box_0 = [
         (frame_width - norm_box_length) // 2, # left bound
-        (frame_height - norm_box_length) // 2, # bottom bound 
+        (frame_height - norm_box_length) // 2, # bottom bound , or top bound?
         (frame_width + norm_box_length) // 2, # right bound 
-        (frame_height + norm_box_length) // 2, # top bound
+        (frame_height + norm_box_length) // 2, # top bound, or bototm boudn?
+    ]
+    start_x = mid_height - norm_box_length
+    bottom_y = frame_height - norm_box_length
+    norm_box_1 = [
+        start_x - gap, # left
+        bottom_y - gap, # bottom
+        start_x - gap + norm_box_length, # right
+        frame_height - gap # top
+    ]
+    norm_box_2 = [
+        start_x + norm_box_length + gap, # left
+        bottom_y - gap, # bottom
+        start_x + gap + norm_box_length,  #ight
+        frame_height - gap # top
     ]
     stuff = {
         "cap" : cap,
-        "norm_box" : norm_box,
+        "norm_box_0" : norm_box_0,
+        "norm_box_1" : norm_box_1,
+        "norm_box_2" : norm_box_2,
         "frame_dimensions" : (frame_width, frame_height),
         "norm_box_dimensions" : (norm_box_length, norm_box_length),
     }
@@ -95,6 +115,32 @@ def create_analytics(time, data):
     # return image
     return image
 
+def add_limbs_to_frame(norm_body : list, norm_box : list, frame : np.array):
+    # color
+    line_color = (255, 0, 0)
+    line_thickness = 1
+    circle_color = (0, 255, 0)
+    circle_radius = 3
+    circle_thickness = 4
+    rectangle_color = (102, 51, 153)
+    rectangle_thickness = 4
+
+     # limb is not visible if points are [[0, 0], [0, 0]]
+    invisible_limb = [[0, 0], [0, 0]]
+    visibility = [limb != invisible_limb for limb in norm_body]
+    for i, limb in enumerate(norm_body):
+        if visibility[i]:
+            start = [a + b for a,b in zip(limb[0], [norm_box[0], norm_box[1]])]
+            end = [a + b for a,b in zip(limb[0], [norm_box[0], norm_box[1]])]
+            cv2.line(frame, start, end, line_color, line_thickness)
+            cv2.circle(frame, start, radius=circle_radius, color=circle_color, thickness=circle_thickness)
+            cv2.circle(frame, end, radius=circle_radius, color=circle_color, thickness=circle_thickness)
+    
+    # show norm square
+    cv2.rectangle(frame, (norm_box[0], norm_box[1]), (norm_box[2], norm_box[3]), color=rectangle_color, thickness=rectangle_thickness)
+    
+    return frame
+
 # init source csv, also get source video
 csv_fp = "./data/test_csvs/flossslow.csv"
 keys_df = dh.load_csv_from_file(csv_fp)
@@ -146,8 +192,11 @@ while cap.isOpened():
         break
 
 # for analytics
-analytics = True
+analytics = False
 error_over_time = []
+
+# limb view
+limb_view = True
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -161,7 +210,7 @@ while cap.isOpened():
 
     # error calculation
     # setup temporal range
-    temporal_size = 5 # establishes a range of (n - temporal_size, n + temporal_size) working on frame n to calculate error on
+    temporal_size = 1 # establishes a range of (n - temporal_size, n + temporal_size) working on frame n to calculate error on
     temporal_left_bound = frame_counter - temporal_size if frame_counter - temporal_size >= 0 else 0
     temporal_right_bound = frame_counter + temporal_size if frame_counter + temporal_size <= video_frames_right_bound else video_frames_right_bound
     temporal_frame_range = [temporal_left_bound, temporal_right_bound]
@@ -173,12 +222,6 @@ while cap.isOpened():
     error = ed.min_temporal_pose_error(source_bodies_usable, norm_body)
     error_over_time.append(error)
 
-    # display on screen
-    caption = f"Error: {error}"
-    source_frame = video_frames[frame_counter]
-    cv2.putText(source_frame, caption, (50, 100), font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
-    cv2.imshow(window_caption, source_frame)
-
     # analytics screen
     if analytics:
         time_indices = list(range(frame_counter + 1))
@@ -189,6 +232,18 @@ while cap.isOpened():
         # display
         analytics_caption = "error over time"
         cv2.imshow(analytics_caption, chart)
+
+    # display on screen
+    caption = f"Error: {error}"
+    source_frame = video_frames[frame_counter]
+
+    if limb_view:
+        add_limbs_to_frame(norm_body, camera_stuff["norm_box_1"], source_frame)
+        current_source_body_index = len(source_bodies_usable) // 2
+        add_limbs_to_frame(source_bodies_usable[current_source_body_index], camera_stuff["norm_box_2"], source_frame)
+    
+    cv2.putText(source_frame, caption, (50, 100), font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
+    cv2.imshow(window_caption, source_frame)
 
     #increment
     frame_counter += 1
