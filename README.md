@@ -24,6 +24,7 @@ python -m venv venv
 
 ```bash
 python -m pip install ultralytics
+python -m pip install pyside6
 ```
 
 ## TODO
