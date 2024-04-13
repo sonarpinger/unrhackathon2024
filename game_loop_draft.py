@@ -7,6 +7,9 @@
 import cv2
 import time
 from ultralytics import YOLO
+import matplotlib.pyplot as plt
+from io import BytesIO
+import numpy as np
 
 import data_helpers as dh
 import error_detection as ed
@@ -68,6 +71,30 @@ def run_model(frame, model, args=None):
     }
     return stuff 
 
+def create_analytics(time, data):
+    # create an index list from 0 to length of differences list
+    fig, ax = plt.subplots()
+
+    # plot the data 
+    ax.plot(time, data, marker='o', linestyle='-', color='b')
+
+    # add title and labels 
+    ax.set_title('Differences Over Time')
+    ax.set_xlabel('Time Index')
+    ax.set_ylabel('Difference')
+
+    # save plot to bytesio buffer
+    buf = BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+
+    # load buffer into numpy and convert to opencv image
+    image = np.frombuffer(buf.getvalue(), dtype=np.uint8)
+    image = cv2.imdecode(image, cv2.IMREAD_COLOR)
+
+    # return image
+    return image
+
 # init source csv, also get source video
 csv_fp = "./data/test_csvs/flossslow.csv"
 keys_df = dh.load_csv_from_file(csv_fp)
@@ -118,6 +145,10 @@ while cap.isOpened():
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
+# for analytics
+analytics = True
+error_over_time = []
+
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
@@ -140,12 +171,24 @@ while cap.isOpened():
     source_bodies_usable = [dh.usable_keypoints(keys) for keys in source_bodies_raw]
     # get error
     error = ed.min_temporal_pose_error(source_bodies_usable, norm_body)
+    error_over_time.append(error)
 
     # display on screen
     caption = f"Error: {error}"
     source_frame = video_frames[frame_counter]
     cv2.putText(source_frame, caption, (50, 100), font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
     cv2.imshow(window_caption, source_frame)
+
+    # analytics screen
+    if analytics:
+        time_indices = list(range(frame_counter + 1))
+
+        # get chart 
+        chart = create_analytics(time_indices, error_over_time)
+
+        # display
+        analytics_caption = "error over time"
+        cv2.imshow(analytics_caption, chart)
 
     #increment
     frame_counter += 1
@@ -157,6 +200,8 @@ while cap.isOpened():
     # break loop if q
     if cv2.waitKey(10) & 0xFF == ord('q'):
         break
+
+
 
 # When everything is done, release the capture
 cap.release()

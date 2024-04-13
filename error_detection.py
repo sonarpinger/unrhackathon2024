@@ -3,6 +3,8 @@
 # File: Error Detection
 # Description: module for holding all functions relating to pose detection
 
+import numpy as np
+
 def limb_delta(limb_truth : list, limb_test : list) -> float:
     """
     Takes two limbs, each of structure [[x1, y1], [x2, y2]], and calculates the difference between them
@@ -13,6 +15,26 @@ def limb_delta(limb_truth : list, limb_test : list) -> float:
     difference = sum(sum(inner_list) for inner_list in _difference) # add each difference between the keypoints
     return difference
 
+def delta_linear_scalar(difference : float) -> float:
+    """
+    scale the error to be more dramatic the further away it is
+    implements linear scaling
+    """
+    old_min, old_max = 250, 2500
+    new_min, new_max = 250, 100000
+    scaled_dif = new_min + (difference - old_min) * (new_max - new_min) / (old_max - old_min)
+    return scaled_dif
+
+
+def get_difference(limb_truth : list, limb_test : list) -> float:
+    """
+    performs all the calcs needed to get a difference between two limbs
+    """
+    simple_dif = limb_delta(limb_truth, limb_test)
+    scaled_dif = delta_linear_scalar(simple_dif)
+    return scaled_dif
+
+
 def simple_pose_error(body_truth : list, body_test : list) -> float:
     """
     A simple error function that takes the total difference between two body lists, 
@@ -21,7 +43,7 @@ def simple_pose_error(body_truth : list, body_test : list) -> float:
     error_sum = 0 # keep track of total error of all limbs
     for i, limb_truth in enumerate(body_truth):
         limb_test = body_test[i]
-        error = limb_delta(limb_truth, limb_test) # get error for that limb
+        error = get_difference(limb_truth, limb_test) # get error for that limb
         error_sum += error # add
     return error_sum # return total sum of differences as an error
 
