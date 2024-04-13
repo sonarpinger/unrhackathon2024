@@ -44,16 +44,28 @@ def main(args):
       box = [0, 0, 0, 0]
     #output bounding box
     cv2.rectangle(frame, (int(box[0]), int(box[1])), (int(box[2]), int(box[3])), (0, 0, 255), 2)
+    box_start = [int(box[0]), int(box[1])]
 
     # Show the keypoints
     visible = [i for i in range(keypoints.shape[0]) if keypoints[i][0] != 0 and keypoints[i][1] != 0]
     for limb in body:
+      #show only visible limbs
       if limb[0] in visible and limb[1] in visible:
         start = keypoints[limb[0]]
         end = keypoints[limb[1]]
+        #unnormalized keypoints
         cv2.line(frame, (int(start[0]), int(start[1])), (int(end[0]), int(end[1])), (255, 0, 0), thickness=1)
-        cv2.circle(frame, (int(start[0]), int(start[1])), radius=3, color=(0, 255, 0), thickness=2)
-        cv2.circle(frame, (int(end[0]), int(end[1])), radius=3, color=(0, 0, 255), thickness=2)
+        cv2.circle(frame, (int(start[0]), int(start[1])), radius=3, color=(0, 255, 0), thickness=1)
+        cv2.circle(frame, (int(end[0]), int(end[1])), radius=3, color=(0, 0, 255), thickness=1)
+        #normalized offsets
+        norm_start_x = int((start[0] - box_start[0]) * norm_box_size / (box[2] - box[0])) #(limb x - box x) * norm box size / box width
+        norm_start_y = int((start[1] - box_start[1]) * norm_box_size / (box[3] - box[1])) #(limb y - box y) * norm box size / box height
+        norm_end_x = int((end[0] - box_start[0]) * norm_box_size / (box[2] - box[0])) #(limb x - box x) * norm box size / box width
+        norm_end_y = int((end[1] - box_start[1]) * norm_box_size / (box[3] - box[1])) #(limb y - box y) * norm box size / box height
+        #add offsets to start of norm box
+        cv2.circle(frame, (norm_start_x + norm_box[0], norm_start_y + norm_box[1]), radius=3, color=(0, 255, 0), thickness=3)
+        cv2.circle(frame, (norm_end_x + norm_box[0], norm_end_y + norm_box[1]), radius=3, color=(0, 0, 255), thickness=3)
+        cv2.line(frame, (norm_start_x + norm_box[0], norm_start_y + norm_box[1]), (norm_end_x + norm_box[0], norm_end_y + norm_box[1]), (255, 0, 0), thickness=3)
 
     #draw normalized box
     cv2.rectangle(frame, (norm_box[0], norm_box[1]), (norm_box[2], norm_box[3]), (102, 51, 153), 2)
