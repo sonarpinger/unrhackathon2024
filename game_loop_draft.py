@@ -26,29 +26,30 @@ def init_camera():
     cap.set(cv2.CAP_PROP_FPS, dh.FRAME_RATE)
 
     # normalization window
-    norm_box_length = 250
+    norm_box_width = 200
+    norm_box_height = 300
     mid_width = frame_width // 2
     mid_height = frame_height // 2
     gap = 15
 
     norm_box_0 = [
-        (frame_width - norm_box_length) // 2, # left bound
-        (frame_height - norm_box_length) // 2, # bottom bound , or top bound?
-        (frame_width + norm_box_length) // 2, # right bound 
-        (frame_height + norm_box_length) // 2, # top bound, or bototm boudn?
+        (frame_width - norm_box_width) // 2, # left bound
+        (frame_height - norm_box_height) // 2, # bottom bound , or top bound?
+        (frame_width + norm_box_width) // 2, # right bound 
+        (frame_height + norm_box_height) // 2, # top bound, or bototm boudn?
     ]
-    start_x = mid_width - norm_box_length
-    bottom_y = mid_height - norm_box_length
+    start_x = mid_width - norm_box_width
+    bottom_y = frame_height - norm_box_height
     norm_box_1 = [
         start_x - gap, # left
         bottom_y - gap, # bottom
-        start_x - gap + norm_box_length, # right
+        start_x - gap + norm_box_width, # right
         frame_height - gap # top
     ]
     norm_box_2 = [
-        start_x + norm_box_length + gap, # left
+        start_x + norm_box_width + gap, # left
         bottom_y - gap, # bottom
-        start_x + gap + norm_box_length,  #ight
+        start_x + gap + norm_box_width * 2,  #ight
         frame_height - gap # top
     ]
     stuff = {
@@ -57,7 +58,7 @@ def init_camera():
         "norm_box_1" : norm_box_1,
         "norm_box_2" : norm_box_2,
         "frame_dimensions" : (frame_width, frame_height),
-        "norm_box_dimensions" : (norm_box_length, norm_box_length),
+        "norm_box_dimensions" : (norm_box_width, norm_box_height),
     }
     return stuff
 
@@ -67,6 +68,18 @@ def init_body():
     left_leg = [12, 14]
     right_leg = [11, 13]
     body = [right_arm, left_arm, right_leg, left_leg]
+    return body
+
+def init_body_v2():
+    right_upper_arm = [6, 8]
+    right_forearm = [8, 10]
+    left_upper_arm = [7, 9]
+    left_forearm = [9, 11]
+    right_quad = [12, 14]
+    right_calf = [14, 16]
+    left_quad = [13, 15]
+    left_calf = [15, 17]
+    body = [right_upper_arm, right_forearm, left_upper_arm, left_forearm, right_quad, right_calf, left_quad, left_calf]
     return body
 
 def run_model(frame, model, args=None):
@@ -157,9 +170,9 @@ def body_printout(body):
     print(f"left leg: {body[3]} || x_len : {body[3][1][0] - body[3][0][0]} || y_len: {body[3][1][1] - body[3][0][1]}")
 
 # init source csv, also get source video
-csv_fp = "./data/test_csvs/stand.csv"
+csv_fp = "./data/test_csvs/take-the-l.csv"
 keys_df = dh.load_csv_from_file(csv_fp)
-video_fp = "./data/test_videos/stand.mp4"
+video_fp = "./data/test_videos/take-the-l.mp4"
 video_frames = dh.load_video_from_file(video_fp) # can either load
 video_frames_right_bound = len(video_frames) - 1 # assumes keypoints df and video_frames are aligned (as they are from the same source material) keypoint csv capture is at 25 fps right now and video frame output is at 25 fps
 
