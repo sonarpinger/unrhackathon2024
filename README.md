@@ -6,8 +6,22 @@
 
 ## Models
 
-### Pose Estimation
+### Pose Estimation with Ultralyics YOLO Model
 
 ## GUI
 
 ### Qt
+
+## Initialization
+
+### venv
+
+```bash
+python -m venv venv
+```
+
+### requirements
+
+```bash
+python -m pip install ultralytics
+```
