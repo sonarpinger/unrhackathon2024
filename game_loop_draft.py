@@ -71,14 +71,14 @@ def init_body():
     return body
 
 def init_body_v2():
-    right_upper_arm = [6, 8]
-    right_forearm = [8, 10]
-    left_upper_arm = [7, 9]
-    left_forearm = [9, 11]
-    right_quad = [12, 14]
-    right_calf = [14, 16]
-    left_quad = [13, 15]
-    left_calf = [15, 17]
+    right_upper_arm = [5, 7]
+    right_forearm = [7, 9]
+    left_upper_arm = [6, 8]
+    left_forearm = [8, 10]
+    right_quad = [11, 13]
+    right_calf = [13, 15]
+    left_quad = [12, 14]
+    left_calf = [14, 16]
     body = [right_upper_arm, right_forearm, left_upper_arm, left_forearm, right_quad, right_calf, left_quad, left_calf]
     return body
 
@@ -170,9 +170,10 @@ def body_printout(body):
     print(f"left leg: {body[3]} || x_len : {body[3][1][0] - body[3][0][0]} || y_len: {body[3][1][1] - body[3][0][1]}")
 
 # init source csv, also get source video
-csv_fp = "./data/test_csvs/take-the-l.csv"
+dance = "floss-new"
+csv_fp = f"./data/full_csvs/{dance}.csv"
 keys_df = dh.load_csv_from_file(csv_fp)
-video_fp = "./data/test_videos/take-the-l.mp4"
+video_fp = f"./data/test_videos/{dance}.mp4"
 video_frames = dh.load_video_from_file(video_fp) # can either load
 video_frames_right_bound = len(video_frames) - 1 # assumes keypoints df and video_frames are aligned (as they are from the same source material) keypoint csv capture is at 25 fps right now and video frame output is at 25 fps
 
@@ -182,11 +183,11 @@ camera_stuff = init_camera()
 cap = camera_stuff["cap"]
 window_caption = "Dance Planet"
 
-body = init_body()
+body = init_body_v2()
 
 # error params
-threshold = 0
-above_ratio = 1.0
+threshold = 10
+above_ratio = 5.0
 below_ratio = 1.0
 
 # frame counter for aligning camera output with with source video, works bc both camera input and source vid input should be aligned fps
@@ -257,7 +258,7 @@ while cap.isOpened():
     # get source keypoints for comparison
     source_bodies_raw = dh.get_keypoints_from_df_range(keys_df, temporal_frame_range)
     # convert to usable keypoints
-    source_bodies_usable = [dh.usable_keypoints(keys) for keys in source_bodies_raw]
+    source_bodies_usable = [dh.usable_keypoints_v2(keys) for keys in source_bodies_raw]
     # get error
     error = ed.min_temporal_pose_error(source_bodies_usable, norm_body, threshold, above_ratio, below_ratio)
     error_over_time.append(error)
