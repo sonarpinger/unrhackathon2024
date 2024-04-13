@@ -57,7 +57,7 @@ def body_normalize(frame_stuff : dict, model_stuff : dict, body : list) -> list:
             ]
             norm_limb = [norm_start, norm_end] # got normed limb!
         else:
-            norm_limb = [[-1, -1], [-1, -1]] # standard value for limb that doesnt exist (isnt visible)
+            norm_limb = [[0, 0], [0, 0]] # standard value for limb that doesnt exist (isnt visible)
         norm_body.append(norm_limb)
     
     return norm_body
