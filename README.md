@@ -37,7 +37,7 @@ python -m pip install pyside6
 
 - [x] Normalize Limb Vectors and Bounding Box
 
-- [ ] Start on GUI
+- [x] Start on GUI
 
 - [ ] Output Keypoints Over Time
 
