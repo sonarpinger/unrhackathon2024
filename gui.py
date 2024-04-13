@@ -14,15 +14,16 @@ class MyWidget(QtWidgets.QWidget):
     super().__init__()
     background_color = "#764abc"
     # pixelFont = QtGui.QFont(str(font_path), 30)
-    pixelFont = QtGui.QFont("VT323", 30)
+    pixelFontBig = QtGui.QFont("Broadway", 30)
+    pixelFontSmall = QtGui.QFont("Broadway", 12)
 
     self.hello = ["Hallo Welt", "Hei maailma", "Hola Mundo", "Привет мир"]
 
     self.button = QtWidgets.QPushButton("Click me!")
     self.text = QtWidgets.QLabel("Hello World",
                                     alignment=QtCore.Qt.AlignCenter)
-    self.text.setFont(pixelFont)
-    self.button.setFont(pixelFont)
+    self.text.setFont(pixelFontBig)
+    self.button.setFont(pixelFontSmall)
 
     self.layout = QtWidgets.QVBoxLayout(self)
     self.layout.addWidget(self.text)
