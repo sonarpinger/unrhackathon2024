@@ -8,7 +8,7 @@ Check out https://doc.qt.io/qtcreator/creator-quick-ui-forms.html for details on
 */
 import QtQuick 6.5
 import QtQuick.Controls 6.5
-import UntitledProject
+// import UntitledProject
 
 Rectangle {
     id: rectangle
@@ -71,6 +71,9 @@ Rectangle {
             display: AbstractButton.TextOnly
             clip: false
             checkable: false
+            onClicked: {
+                screenLoader.source = "screens/practice_mode.ui.qml"
+            }
         }
 
         Button {
@@ -96,24 +99,24 @@ Rectangle {
 
     Image {
         id: pixelearf
-        x: 867
+        x: 914
         y: 140
         width: 868
         height: 917
         anchors.verticalCenter: parent.verticalCenter
         source: "../assets/images/pixelearf.png"
-        anchors.verticalCenterOffset: 0
+        anchors.verticalCenterOffset: 1
         fillMode: Image.PreserveAspectFit
 
         Text {
             id: text2
             x: 222
-            y: 36
+            y: 731
             color: "#f5e2ff"
             text: qsTr("PLANET")
             font.letterSpacing: 10
             font.pixelSize: 130
-            anchors.horizontalCenterOffset: 0
+            anchors.horizontalCenterOffset: 16
             font.family: "VT323"
             anchors.horizontalCenter: parent.horizontalCenter
         }
@@ -121,14 +124,14 @@ Rectangle {
         Text {
             id: text3
             x: 207
-            y: 718
+            y: 28
             color: "#f5e2ff"
             text: qsTr("DANCE")
             font.letterSpacing: 10
             font.pixelSize: 130
             font.kerning: true
             renderType: Text.QtRendering
-            anchors.horizontalCenterOffset: 0
+            anchors.horizontalCenterOffset: 16
             font.family: "VT323"
             anchors.horizontalCenter: pixelearf.horizontalCenter
         }

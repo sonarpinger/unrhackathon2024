@@ -8,7 +8,7 @@ Check out https://doc.qt.io/qtcreator/creator-quick-ui-forms.html for details on
 */
 import QtQuick 6.5
 import QtQuick.Controls 6.5
-import UntitledProject
+ // import UntitledProject
 
 Rectangle {
     id: rectangle
@@ -58,6 +58,26 @@ Rectangle {
             text: qsTr("Dance: ")
             font.pointSize: 63
             font.family: "VT323"
+        }
+
+        Button {
+            id: button2
+            width: 440
+            height: 109
+            opacity: 1
+            visible: true
+            text: qsTr("QUIT")
+            font.letterSpacing: 4.3
+            z: 1
+            layer.enabled: true
+            highlighted: false
+            font.wordSpacing: -6.4
+            font.pointSize: 41
+            font.family: "VT323"
+            flat: false
+            display: AbstractButton.TextOnly
+            clip: false
+            checkable: false
         }
     }
 
