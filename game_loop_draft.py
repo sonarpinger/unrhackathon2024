@@ -170,7 +170,7 @@ def body_printout(body):
     print(f"left leg: {body[3]} || x_len : {body[3][1][0] - body[3][0][0]} || y_len: {body[3][1][1] - body[3][0][1]}")
 
 # init source csv, also get source video
-dance = "floss-new"
+dance = "floss"
 csv_fp = f"./data/full_csvs/{dance}.csv"
 keys_df = dh.load_csv_from_file(csv_fp)
 video_fp = f"./data/test_videos/{dance}.mp4"

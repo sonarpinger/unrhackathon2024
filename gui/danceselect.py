@@ -44,7 +44,7 @@ class DanceSelect(tk.Frame):
         self.lowest_frame = tk.Frame(self)
         self.lowest_frame.configure(bg="#A020F0")
         self.lowest_frame.pack(side=tk.BOTTOM, fill=tk.X, expand=True)
-        back_btn = tk.Button(self.lowest_frame, text="Back to Home", font=("Terminal", 16), bg="#A020F0", command=lambda: self.back_to_home())
+        back_btn = tk.Button(self.lowest_frame, text="Back to Home", font=("Terminal", 50), bg="#A020F0", command=lambda: self.back_to_home())
         back_btn.pack(anchor=tk.S, pady=(0,30), side=tk.BOTTOM)
 
         #self.lower_frame = tk.Frame(self)

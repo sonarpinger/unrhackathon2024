@@ -31,6 +31,7 @@ class Practice(tk.Frame):
         self.controller = controller
         self.continue_looping = False
         self.thread = None
+        self.webcam_res = (520, 400)
 
         #self.selection = {
         #    "dance-moves": False,
@@ -51,7 +52,7 @@ class Practice(tk.Frame):
         # scores label
         self.scores_bar = tk.Frame(self.side_bar)
         self.scores_bar.pack(side=tk.TOP, pady=(30, 50))
-        self.player1ScoreLabel = tk.Label(self.scores_bar, text="Score: 0", font=("Terminal", 14))
+        self.player1ScoreLabel = tk.Label(self.scores_bar, text="Score: 0", font=("Terminal", 30))
         self.player1ScoreLabel.pack()
         #self.player2ScoreLabel = tk.Label(self.scores_bar, text="Player 2 Score: 0", font=("Terminal", 14))
         #self.player2ScoreLabel.pack()
@@ -67,8 +68,8 @@ class Practice(tk.Frame):
         self.current_count = 5
         self.countdown_bar = tk.Frame(self.side_bar)
         self.countdown_bar.pack()
-        self.countdown_bar_label = tk.Label(self.countdown_bar, text=str(self.current_count), font=("Terminal", 20))
-        self.countdown_bar_label.pack(pady=(40, 40))
+        self.countdown_bar_label = tk.Label(self.countdown_bar, text=str(self.current_count), font=("Terminal", 50))
+        self.countdown_bar_label.pack(pady=(200, 10))
 
         # buttons
         self.buttons_bar = tk.Frame(self.side_bar)
@@ -81,7 +82,7 @@ class Practice(tk.Frame):
         self.startbutton.pack(side=tk.BOTTOM, fill=tk.X, pady=(0,20))
 
         # video display labels
-        self.video_label = tk.Label(self)
+        self.video_label = tk.Label(self, bg="#A020F0")
         self.video_label.place(x=320, y=25, width=1440, height=960)
         self.webcam_widget = tk.Frame(self)
         self.webcam_widget.pack(side=tk.TOP, anchor=tk.NE, padx=10, pady=10)
@@ -163,7 +164,7 @@ class Practice(tk.Frame):
         web_frame = cv2.cvtColor(web_frame, cv2.COLOR_BGR2RGB)
         #web_frame = cv2.flip(web_frame, 1)
         web_frame = Image.fromarray(web_frame)
-        web_frame = web_frame.resize((320, 240))
+        web_frame = web_frame.resize(self.webcam_res)
         img_tk = ImageTk.PhotoImage(image=web_frame)
         self.webcam_video_label.img_tk = img_tk  # Keep reference to avoid garbage collection
         self.webcam_video_label.config(image=img_tk)
@@ -355,5 +356,6 @@ class Practice(tk.Frame):
         if self.thread:
             self.thread.stop()
         self.frame_counter = len(self.dance.video_frames) + 1
+        self.controller.stop_music()
         #self.proc.terminate()
         

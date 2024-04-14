@@ -49,7 +49,7 @@ class BattleSelect(tk.Frame):
             self.buttons[dance] = button
 
             # Create label under the button
-            label = tk.Label(frame, text="Not Selected", bg="#A020F0", fg="#FFFFFF")
+            label = tk.Label(frame, text="Not Selected", font=("Terminal", 20), bg="#A020F0", fg="#FFFFFF")
             label.pack()
             self.labels[dance] = label
 
@@ -61,10 +61,10 @@ class BattleSelect(tk.Frame):
         self.lowest_frame.configure(bg="#A020F0")
         self.lowest_frame.pack(side=tk.BOTTOM, fill=tk.X, expand=True)
         # Start button for proceeding with selected option
-        start_btn = tk.Button(self.lowest_frame, text="Start Battle", font=("Terminal", 16), bg="#A020F0", command=self.start_battle)
+        start_btn = tk.Button(self.lowest_frame, text="Start Battle", font=("Terminal", 40), bg="#A020F0", command=self.start_battle)
         start_btn.pack(padx=10, pady=20, side=tk.TOP)
         
-        back_btn = tk.Button(self.lowest_frame, text="Back to Home", font=("Terminal", 16), bg="#A020F0", command=lambda: self.back_to_home())
+        back_btn = tk.Button(self.lowest_frame, text="Back to Home", font=("Terminal", 40), bg="#A020F0", command=lambda: self.back_to_home())
         back_btn.pack(anchor=tk.S, pady=(0,30), side=tk.BOTTOM)
 
     def start_battle(self):

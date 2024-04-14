@@ -9,19 +9,20 @@ class Results(tk.Frame):
 
         self.stats = {}
 
-        label = tk.Label(self, text="Results", font=("Arial", 18))
+        label = tk.Label(self, text="Results", font=("Arial", 50))
         label.pack(pady=20)
 
         self.stats_frame = tk.Frame(self)
+        self.stats_frame.configure(bg="#A020F0")
         self.stats_frame.pack()
-        self.mode_label = tk.Label(self.stats_frame)
-        self.p1_score_label = tk.Label(self.stats_frame, bg="#A020F0", font=("Terminal", 28))
-        self.p2_score_label = tk.Label(self.stats_frame, bg="#A020F0", font=("Terminal", 28))
-        self.winner_label = tk.Label(self.stats_frame, bg="#A020F0", font=("Terminal", 50))
+        self.mode_label = tk.Label(self.stats_frame, bg="#A020F0", font=("Terminal", 70))
+        self.p1_score_label = tk.Label(self.stats_frame, bg="#A020F0", font=("Terminal", 80))
+        self.p2_score_label = tk.Label(self.stats_frame, bg="#A020F0", font=("Terminal", 80))
+        self.winner_label = tk.Label(self.stats_frame, bg="#A020F0", font=("Terminal", 70))
 
         self.buttons = tk.Frame(self)
         self.buttons.pack(side=tk.BOTTOM, pady=(20, 30))
-        self.exit_button = self.endbutton = tk.Button(self.buttons, text="Home Screen", bg="#A020F0", font=("Terminal", 34), command=lambda: self.back_to_home())
+        self.exit_button = self.endbutton = tk.Button(self.buttons, text="Home Screen", bg="#A020F0", font=("Terminal", 60), command=lambda: self.back_to_home())
         self.exit_button.pack(side=tk.BOTTOM, fill=tk.X)
 
     def back_to_home(self):

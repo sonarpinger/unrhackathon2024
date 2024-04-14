@@ -12,12 +12,15 @@ import error_detection as ed
 import pose_keypoints as pk
 
 # helper functions 
-def init_camera():
+def init_camera(fp : str = None):
     """
     capture is either 0 or fp to video for comparison
     """
     # streaming window
-    cap = cv2.VideoCapture(0)
+    if fp:
+        cap = cv2.VideoCapture(fp)
+    else:
+        cap = cv2.VideoCapture(0)
     frame_width = int(cap.get(3)) # get window width
     frame_height = int(cap.get(4)) # get window height
 

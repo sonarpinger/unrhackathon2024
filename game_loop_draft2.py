@@ -19,7 +19,7 @@ from choreography import Choreography
 # griddy : 241
 
 chor_fp = "./data/choreographies/chors.csv"
-source_dance = Choreography.get_chor_from_csv(chor_fp, name = "floss-new")
+source_dance = Choreography.get_chor_from_csv(chor_fp, name = "floss")
 # source_dance = Choreography(
 #     name = "floss-new",
 #     threshold = 0,
@@ -31,8 +31,8 @@ source_dance = Choreography.get_chor_from_csv(chor_fp, name = "floss-new")
 #     max_error = 300,
 #     score_timing = 3,
 # )
-# test_dance = "./data/test_videos/flossanthony.mp4"
-test_dance = 0
+test_dance = "./data/test_videos/flossanthony.mp4"
+# test_dance = 0
 flags = {
     "analytics" : True,
     "limb_view" : False,
