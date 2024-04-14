@@ -69,14 +69,15 @@ class Battle(tk.Frame):
         self.video_label = tk.Label(self)
         self.video_label.place(x=320, y=25, width=1440, height=960)
         self.webcam_video_label = tk.Label(self)
-        self.webcam_video_label.place(x=320, y=25, width=320, height=240)
+        self.webcam_video_label.place(x=320, y=25, width=1500, height=240)
 
         # game loop stuff
         self.flags = {
             "countdown" : True,
             "analytics" : False,
-            "limb_view" : False,
-            "score_timing" : 3
+            "limb_view" : True,
+            "score_timing" : 3,
+            "hf" : False
         }
         self.body = dch.init_body_v2()
         self.model = YOLO("./yolov8n-pose.pt")
@@ -121,6 +122,18 @@ class Battle(tk.Frame):
 
     def begin_battle(self):
         self.continue_looping = True
+        self.players = [
+            {
+                "name" : "Player 1",
+                "score" : 0,
+                "cd_message" : "Get ready Player 1!"
+            },
+            {
+                "name" : "Player 2",
+                "score" : 0,
+                "cd_message" : "Get ready Player 2!"
+            }
+        ]
         threading.Thread(target=self.game_loop, daemon=True).start()
 
     def gui_update(self, frames):
@@ -129,6 +142,7 @@ class Battle(tk.Frame):
     def update_labels(self, frames):
         web_frame, vid_frame = frames
         web_frame = cv2.cvtColor(web_frame, cv2.COLOR_BGR2RGB)
+        web_frame = cv2.flip(web_frame, 1)
         web_frame = Image.fromarray(web_frame)
         web_frame = web_frame.resize((320, 240))
         img_tk = ImageTk.PhotoImage(image=web_frame)
@@ -145,8 +159,8 @@ class Battle(tk.Frame):
         # update scores
         p1_score = self.players[0]["score"]
         p2_score = self.players[1]["score"]
-        self.player1ScoreLabel.config(text=f"Player 1 Score : {p1_score}")
-        self.player2ScoreLabel.config(text=f"Player 2 Score : {p2_score}")
+        self.player1ScoreLabel.config(text=f"Player 1 Score : {int(p1_score)}")
+        self.player2ScoreLabel.config(text=f"Player 2 Score : {int(p2_score)}")
 
         # update countdown if applicable
         self.countdown_bar_label.config(text=str(self.current_count))
@@ -221,7 +235,8 @@ class Battle(tk.Frame):
                     # get normalized body list by using camera frame size, model output, and standard body limb setup
                     norm_body = pk.body_normalize(self.camera_stuff, model_stuff, self.body)
                     # add horizontal flip of keypoints if on webcam
-                    norm_body = pk.horizontal_body_flip(self.camera_stuff, norm_body)
+                    if self.flags["hf"]:
+                        norm_body = pk.horizontal_body_flip(self.camera_stuff, norm_body)
 
                     # temporal stuff for error detecting
                     temporal_left_bound = self.frame_counter - temporal_size if self.frame_counter - temporal_size >= 0 else 0
