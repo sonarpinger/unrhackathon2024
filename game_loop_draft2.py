@@ -25,12 +25,16 @@ error_parameters = {
     "above_ratio" : 1.0,
     "below_ratio" : 0.5,
     "temporal_size" : 25,
+    "sma_window" : 10, # equal to fps?
+    "min_error" : 50,
+    "max_error" : 300,
+    "score_timing" : 3,
 }
 flags = {
-    "analytics" : False,
-    "limb_view" : True,
+    "analytics" : True,
+    "limb_view" : False,
     "data_printout" : False,
-    "countdown" : False,
+    "countdown" : True,
 }
 
 def display_chart(image):

@@ -141,3 +141,21 @@ def max_temporal_pose_error(_body_truth : list, body_test : list, threshold : in
         if error > max_error:
             max_error = error
     return max_error
+
+def simple_moving_average(values, window_size):
+    # weights = [1.0 / window] * window
+    window_average = round(np.sum(values[-window_size:]) / window_size, 2)
+    return window_average
+
+def error_to_score(min_error : float, max_error : float, current_error : float):
+    """
+    Score is max when current error is min and vice versa
+    """
+
+    move_max_score = 1000
+
+    # Calculate the score using linear scaling
+    score = (1 - (current_error - min_error) / (max_error - min_error)) * 100
+
+    # Clamp the score to be between 0 and 1000 just in case of out-of-bounds errors
+    return max(0, min(move_max_score, score))

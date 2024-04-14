@@ -27,6 +27,10 @@ def dance_comparison(source_dance : str, test_dance, error_parameters, flags) ->
     above_ratio = error_parameters["above_ratio"]
     below_ratio = error_parameters["below_ratio"]
     temporal_size = error_parameters["temporal_size"]
+    sma_window = error_parameters["sma_window"]
+    song_min_error = error_parameters["min_error"]
+    song_max_error = error_parameters["max_error"]
+    score_timing = error_parameters["score_timing"]
 
     test_string = type(test_dance) == str
 
@@ -89,6 +93,10 @@ def dance_comparison(source_dance : str, test_dance, error_parameters, flags) ->
 
     data_printout = flags['data_printout']
 
+    # for getting score
+    last_score_time = time.time()
+    total_score = 0
+
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
@@ -112,10 +120,20 @@ def dance_comparison(source_dance : str, test_dance, error_parameters, flags) ->
         source_bodies_usable = [dh.usable_keypoints_v2(keys) for keys in source_bodies_raw]
         # get error
         error = ed.min_temporal_pose_error(source_bodies_usable, norm_body, threshold, above_ratio, below_ratio)
-        error_over_time.append(error)
+        temp = error_over_time + [error]
+        error_adjusted = ed.simple_moving_average(temp, sma_window)
+        error_over_time.append(error_adjusted)
+
+        # check score
+        current_time = time.time()
+        if current_time - last_score_time >= score_timing:  # Check if one second has passed
+            score = ed.error_to_score(song_min_error, song_max_error, error_adjusted)  # Run the function
+            total_score += score
+            cv2.putText(source_frame, f"+{score} points!", (250, 50), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            last_time_run = current_time  # Reset the last run time
 
         # display on screen
-        caption = f"Error: {error}"
+        caption = f"Error: {error_adjusted}"
         source_frame = video_frames[frame_counter]
         
         if analytics:
@@ -145,6 +163,7 @@ def dance_comparison(source_dance : str, test_dance, error_parameters, flags) ->
         
         # true display
         cv2.putText(source_frame, caption, (50, 100), font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
+        cv2.putText(source_frame, f"Score: {total_score}", (250, 250), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
         cv2.imshow(window_caption, source_frame)
 
         #increment
