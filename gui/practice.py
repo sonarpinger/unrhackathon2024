@@ -29,7 +29,8 @@ class Practice(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
-        self.continue_looping = True
+        self.continue_looping = False
+        self.thread = None
 
         #self.selection = {
         #    "dance-moves": False,
@@ -136,6 +137,7 @@ class Practice(tk.Frame):
 
     def begin_practice(self):
         if self.continue_looping:
+            print("already on!")
             return
         self.controller.stop_music()
         self.continue_looping = True
@@ -340,7 +342,8 @@ class Practice(tk.Frame):
 
     def cleanup(self):
         print("cleaning up")
-        self.thread.stop()
+        if self.thread:
+            self.thread.stop()
         self.frame_counter = len(self.dance.video_frames) + 1
         #self.proc.terminate()
         

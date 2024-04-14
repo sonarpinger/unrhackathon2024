@@ -29,7 +29,7 @@ class Battle(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
-        self.continue_looping = True
+        self.continue_looping = False
         self.thread = None
 
         self.selection = {
@@ -141,6 +141,7 @@ class Battle(tk.Frame):
 
     def begin_battle(self):
         if self.continue_looping:
+            print("already on!")
             return
         self.continue_looping = True
         self.players = [
