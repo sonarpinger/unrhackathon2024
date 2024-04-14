@@ -6,7 +6,7 @@ class HomePage(tk.Frame):
         super().__init__(parent)
         self.controller = controller
 
-        label = tk.Label(self, text="Dance Planet", font=("Terminal", 48), bg="#A020F0")
+        label = tk.Label(self, text="D A N C E   P L A N E T", font=("Terminal", 48, 'bold'), bg="#A020F0", fg="#FFFFFF")
         label.pack(pady=20)
 
         image = tk.PhotoImage(file="gui/assets/images/pixelearfpurp.png")

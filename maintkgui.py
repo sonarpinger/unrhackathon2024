@@ -1,6 +1,12 @@
 import tkinter as tk
 
 from gui import HomePage, Practice, Battle, DanceSelect
+from choreography import Choreography
+
+choreography_file_path = "./data/choreographies/chors.csv"
+
+list_of_dances = Choreography.load_many_from_csv(choreography_file_path)
+
 
 class MainMenu(tk.Tk):
     def __init__(self):
@@ -22,16 +28,29 @@ class MainMenu(tk.Tk):
             self.pages[page_name].grid(row=0, column=0, sticky="nsew")
             self.pages[page_name].configure(background="#A020F0")
 
+        #self.dance = {}
+        #for dance in list_of_dances:
+        #    dance_name = dance.name
+        #    self.dance[dance_name] = dance(self.container, self)
+        #    self.dance[dance_name].grid(row=0, column=0, sticky="nsew")
+        #    self.dance[dance_name].configure(background="#A020F0")
+
         self.show_page("HomePage")
 
     def show_page(self, page_name):
         page = self.pages.get(page_name)
         if page:
             page.tkraise()
+
     def show_dance(self, dance_name):
-        dance = self.pages.get(dance_name)
-        if dance:
-            dance.tkraise()
+        page = self.pages.get("Practice")
+        if page:
+            page.tkraise()
+            #page.load_dance(dance_name)
+            print("Dance selected: ", dance_name)
+        #dance = self.pages.get(dance_name)
+        #if dance:
+        #    dance.tkraise()
 
 if __name__ == "__main__":
     app = MainMenu()
