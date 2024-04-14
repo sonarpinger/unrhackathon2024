@@ -42,5 +42,5 @@ def countdown(cap, countdown_time, font):
         cv2.imshow('practice', frame)
 
         # Break the loop with 'Q' key
-        if cv2.waitKey(100) & 0xFF == ord('q'):
+        if cv2.waitKey(1) & 0xFF == ord('q'):
             break

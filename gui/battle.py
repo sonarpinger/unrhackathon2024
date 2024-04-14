@@ -101,6 +101,7 @@ class Battle(tk.Frame):
         # cv2 stuff
         self.camera_stuff = dch.init_camera_v2(self.controller) # init webcam
         self.cap = self.camera_stuff["cap"]
+        #print(self.cap)
         # self.cap = cv2.VideoCapture(0)
         self.window_caption = "Dance Planet"
         self.font = cv2.FONT_HERSHEY_SIMPLEX
