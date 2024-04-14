@@ -31,7 +31,6 @@ def dance_comparison(source_dance : Choreography, test_dance, flags) -> dict:
     sma_window = source_dance.sma_window
     song_min_error = source_dance.min_error
     song_max_error = source_dance.max_error
-    score_timing = source_dance.score_timing
 
     test_string = type(test_dance) == str
 
@@ -95,6 +94,7 @@ def dance_comparison(source_dance : Choreography, test_dance, flags) -> dict:
     # for getting score
     last_score_time = time.time()
     total_score = 0
+    score_timing = flags["score_timing"]
 
     while cap.isOpened():
         ret, frame = cap.read()

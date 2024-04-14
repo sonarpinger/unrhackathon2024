@@ -5,6 +5,7 @@
 
 import data_helpers as dh
 import csv
+import pandas as pd
 
 class Choreography:
 
@@ -41,7 +42,7 @@ class Choreography:
         chors = []
         chor_df = dh.load_csv_from_file(fp)
         for row in chor_df.itertuples(index=False):
-            chor = cls(row.name, row.threshold, row.above_ratio, row.below_ratio, row.temporal_size, row.sma_winow, row.min_error, row.max_error, row.score_timing)
+            chor = cls(row.name, row.threshold, row.above_ratio, row.below_ratio, row.temporal_size, row.sma_window, row.min_error, row.max_error, row.score_timing)
             chors.append(chor)
         return chors
 
@@ -57,3 +58,18 @@ class Choreography:
         with open(fp, 'a', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(chor.to_csv()) 
+    
+    @classmethod
+    def get_chor_from_csv(cls, fp: str, name : str):
+        chors_df = pd.read_csv(fp)
+        row = chors_df[chors_df["name"] == name].iloc[0]
+        chor = cls(name = row["name"], 
+                   threshold = row["threshold"], 
+                   above_ratio = row["above_ratio"], 
+                   below_ratio = row["below_ratio"], 
+                   temporal_size = row["temporal_size"], 
+                   sma_window = row["sma_window"], 
+                   min_error = row["min_error"], 
+                   max_error = row["max_error"], 
+                   score_timing = row["score_timing"])
+        return chor
