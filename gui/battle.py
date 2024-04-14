@@ -3,6 +3,7 @@ import cv2
 from ultralytics import YOLO
 import time
 from PIL import Image, ImageTk
+import threading
 
 import pose_keypoints as pk
 import dance_comparison_helpers as dch
@@ -120,11 +121,13 @@ class Battle(tk.Frame):
 
     def begin_battle(self):
         self.continue_looping = True
-        self.game_loop()
+        threading.Thread(target=self.game_loop, daemon=True).start()
 
-    # def frame_process(self):
+    def gui_update(self, frames):
+        self.after(0, self.update_labels, frames)
 
-    def update_labels(self, web_frame, vid_frame):
+    def update_labels(self, frames):
+        web_frame, vid_frame = frames
         web_frame = cv2.cvtColor(web_frame, cv2.COLOR_BGR2RGB)
         web_frame = Image.fromarray(web_frame)
         web_frame = web_frame.resize((320, 240))
@@ -199,7 +202,8 @@ class Battle(tk.Frame):
 
                         # Display the resulting frame
                         cv2.putText(frame, player["cd_message"], (50, 100), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
-                        self.update_labels(frame, video_frames[self.frame_counter])
+                        # self.update_labels(frame, video_frames[self.frame_counter])
+                        self.gui_update((frame, video_frames[self.frame_counter]))
 
                         # Break the loop with 'Q' key
                         if cv2.waitKey(100) & 0xFF == ord('q'):
@@ -254,7 +258,8 @@ class Battle(tk.Frame):
 
                     # true display
                     cv2.putText(source_frame, caption, (50, 100), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
-                    self.update_labels(frame, source_frame)
+                    # self.update_labels(frame, source_frame)
+                    self.gui_update((frame, source_frame))
 
                     #increment
                     self.frame_counter += 1
