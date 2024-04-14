@@ -44,7 +44,7 @@ python -m pip install pyside6
 
 - [x] Output Keypoints Over Time
 
-- [ ] Compare Live Keypoints to Basis Keypoints
+- [X] Compare Live Keypoints to Basis Keypoints
 
 - [ ] Create Basis Keypoint Comparisons for Multiple Dances
 
@@ -52,8 +52,14 @@ python -m pip install pyside6
 
 - [x] Create Temporal Error Function
 
-- [ ] Create Score Function
+- [X] Create Score Function
 
 - [ ] Add functionality to GUI
 
 - [ ] Add sound/special effects
+
+- [ ] Aesthetic Upgrade
+
+- [ ] Standardize Source Material 
+
+- [ ] Results Screen at the end of dance run

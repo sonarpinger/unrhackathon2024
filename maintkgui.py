@@ -1,6 +1,7 @@
 import cv2
 import tkinter as tk
 import cv2
+import pygame
 
 from gui import HomePage, Practice, Battle, DanceSelect, BattleSelect
 from choreography import Choreography
@@ -12,6 +13,9 @@ list_of_dances = Choreography.load_many_from_csv(choreography_file_path)
 class MainMenu(tk.Tk):
     def __init__(self):
         super().__init__()
+
+        # for sound
+        pygame.mixer.init()
 
         self.title("Main Menu")
         self.geometry("1920x1080")
@@ -32,6 +36,9 @@ class MainMenu(tk.Tk):
             self.pages[page_name] = PageClass(self.container, self)
             self.pages[page_name].grid(row=0, column=0, sticky="nsew")
             self.pages[page_name].configure(background="#A020F0")
+
+        # load and play background music
+        self.load_and_play_music("./data/sound/hackathonmenu.mp3")
 
         self.show_page("HomePage")
 
@@ -59,6 +66,13 @@ class MainMenu(tk.Tk):
         if page:
             page.load_selection(selection, list_of_dances)
             page.tkraise()
+    
+    def load_and_play_music(self, music_path):
+        pygame.mixer.load(music_path)
+        pygame.mixer.music.play(-1)
+    
+    def stop_music(self):
+        pygame.mixer.music.stop()
     
     def cleanup(self):
         self.cap.release()
