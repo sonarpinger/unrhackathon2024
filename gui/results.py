@@ -25,6 +25,9 @@ class Results(tk.Frame):
         self.exit_button.pack(side=tk.BOTTOM, fill=tk.X)
 
     def back_to_home(self):
+        self.stats = {}
+        self.p2_score_label.pack_forget()
+        self.winner_label.pack_forget()
         self.controller.play_menu_music()
         self.controller.show_page("HomePage")
 
@@ -49,5 +52,6 @@ class Results(tk.Frame):
             self.winner_label.pack(side=tk.BOTTOM)
 
     def load_stats(self, stats):
+        self.stats = {}
         self.stats = stats
         self.update_labels()

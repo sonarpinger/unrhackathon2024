@@ -67,7 +67,7 @@ class Battle(tk.Frame):
         self.countdown_bar = tk.Frame(self.side_bar)
         self.countdown_bar.pack()
         self.countdown_bar_label = tk.Label(self.countdown_bar, text=str(self.current_count), font=("Terminal", 20))
-        self.countdown_bar_label.pack()
+        self.countdown_bar_label.pack(pady=(40, 40))
 
         # buttons
         self.buttons_bar = tk.Frame(self.side_bar)
@@ -93,7 +93,7 @@ class Battle(tk.Frame):
         self.flags = {
             "countdown" : True,
             "analytics" : False,
-            "limb_view" : True,
+            "limb_view" : False,
             "score_timing" : 3,
             "hf" : False
         }
@@ -122,7 +122,7 @@ class Battle(tk.Frame):
         self.frame_counter = 0
         
         # countdown 
-        self.countdown = 3
+        self.countdown = 5
 
         # analytics
         self.error_over_time = []
@@ -218,6 +218,7 @@ class Battle(tk.Frame):
 
                     # init
                     last_score_time = time.time()
+                    score_heat = 0
                     self.frame_counter = 0
 
                     # maybe try to incorporate this loading into the countdown
@@ -261,6 +262,8 @@ class Battle(tk.Frame):
                                 break
 
                     print("finished countdown")
+
+                    self.controller.load_and_play_music(dance.mp3_path)
 
                     while self.cap.isOpened():
                         ret, frame = self.cap.read()
@@ -306,8 +309,11 @@ class Battle(tk.Frame):
                         if current_time - last_score_time >= self.flags["score_timing"]:  # Check if one second has passed
                             score = ed.error_to_score(song_min_error, song_max_error, error_adjusted)  # Run the function
                             self.players[i]["score"] += score
-                            cv2.putText(source_frame, f"+{int(score)} points!", (250, 50), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)
                             last_score_time = current_time  # Reset the last run time
+                            score_heat = 15
+                        if score_heat > 0:
+                            cv2.putText(source_frame, f"+{int(score)} points!", (250, 50), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                            score_heat -= 1
                         
                         if self.flags["limb_view"]:
                             dch.add_limbs_to_frame(norm_body, self.camera_stuff["norm_box_0"], frame)
@@ -316,7 +322,7 @@ class Battle(tk.Frame):
                             # cv2.putText(source_frame, vis_caption, (200, 200), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
 
                         # true display
-                        cv2.putText(source_frame, caption, (50, 100), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
+                        # cv2.putText(source_frame, caption, (50, 100), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
                         # self.update_labels(frame, source_frame)
                         self.gui_update((frame, source_frame))
 
@@ -337,6 +343,9 @@ class Battle(tk.Frame):
                         # if not self.continue_looping:
                         #     quit = True
                         #     break
+                    
+                    self.controller.stop_music()
+
                     if quit:
                         break
                 if quit:

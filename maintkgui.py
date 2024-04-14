@@ -15,7 +15,8 @@ class MainMenu(tk.Tk):
         super().__init__()
 
         # for sound
-        pygame.mixer.init()
+        # pygame.mixer.init()
+        pygame.mixer.init(frequency=44100, size=-16, channels=1, buffer=4096)
 
         self.title("Main Menu")
         self.geometry("1920x1080")
@@ -54,7 +55,7 @@ class MainMenu(tk.Tk):
             page.tkraise()
             for dance in list_of_dances:
                 if dance.name == dance_name:
-                    #print(dance)
+                    print(dance)
                     page.load_dance(dance)
             #page.load_dance(dance_name)
             #print("Dance selected: ", dance_name)

@@ -30,7 +30,7 @@ class DanceSelect(tk.Frame):
 
         defaultButton = tk.Button(self.middle_frame, image=self.defaultDance, font=("Terminal", 16), bg="#A020F0", command=lambda: self.controller.show_dance("dance-moves"))
         defaultButton.pack(side=tk.LEFT, pady=(0,40), expand=True)
-        flossButton = tk.Button(self.middle_frame, image=self.flossDance, font=("Terminal", 16), bg="#A020F0", command=lambda: self.controller.show_dance("floss-new"))
+        flossButton = tk.Button(self.middle_frame, image=self.flossDance, font=("Terminal", 16), bg="#A020F0", command=lambda: self.controller.show_dance("floss"))
         flossButton.pack(side=tk.LEFT, pady=(0,40), expand=True)
         gangnamButton = tk.Button(self.middle_frame, image=self.gangnamDance, font=("Terminal", 16), bg="#A020F0", command=lambda: self.controller.show_dance("gangnam-style"))
         gangnamButton.pack(side=tk.LEFT, pady=(0,40), expand=True)
