@@ -12,6 +12,19 @@ import practice_mode_helpers as bmh
 import error_detection as ed
 from choreography import Choreography
 
+class StoppableThread(threading.Thread):
+    def __init__(self, *args, **kwargs):
+        super(StoppableThread, self).__init__(*args, **kwargs)
+        self._stop_event = threading.Event()
+
+    def stop(self):
+        self._stop_event.set()
+
+    def stopped(self):
+        self.join()
+        return self._stop_event.is_set()
+
+
 class Battle(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
@@ -76,6 +89,7 @@ class Battle(tk.Frame):
         self.webcam_video_label.pack()
 
         # game loop stuff
+        self.current_dance = None
         self.flags = {
             "countdown" : True,
             "analytics" : False,
@@ -139,7 +153,8 @@ class Battle(tk.Frame):
                 "cd_message" : "Get ready Player 2!"
             }
         ]
-        self.thread = threading.Thread(target=self.game_loop, daemon=True)
+        # self.thread = threading.Thread(target=self.game_loop, daemon=True)
+        self.thread = StoppableThread(target=self.game_loop, daemon=True)
         self.thread.start()
 
     def gui_update(self, frames):
@@ -178,6 +193,8 @@ class Battle(tk.Frame):
             for d, dance in enumerate(self.dances):
 
                 print(f"On dance {dance.name}")
+
+                self.current_dance = dance
 
                 # get dance data
                 threshold = dance.threshold
@@ -225,10 +242,16 @@ class Battle(tk.Frame):
                             # Display the resulting frame
                             cv2.putText(frame, player["cd_message"], (50, 100), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
                             # self.update_labels(frame, video_frames[self.frame_counter])
-                            self.gui_update((frame, video_frames[self.frame_counter]))
+                            try:
+                                source_frame = video_frames[self.frame_counter]
+                            except Exception as e:
+                                quit = True
+                                print("frame counter: " + str(self.frame_counter))
+                                break
+                            self.gui_update((frame, source_frame))
 
                             # Break the loop with 'Q' key
-                            if cv2.waitKey(100) & 0xFF == ord('q'):
+                            if cv2.waitKey(1) & 0xFF == ord('q'):
                                 break
 
                     print("finished countdown")
@@ -265,7 +288,12 @@ class Battle(tk.Frame):
 
                         # display on screen
                         caption = f"Error: {error_adjusted}"
-                        source_frame = video_frames[self.frame_counter]
+                        try:
+                            source_frame = video_frames[self.frame_counter]
+                        except Exception as e:
+                            quit = True
+                            print("frame counter: " + str(self.frame_counter))
+                            break
 
                         # check score
                         current_time = time.time()
@@ -300,9 +328,9 @@ class Battle(tk.Frame):
                         if cv2.waitKey(10) & 0xFF == ord('q'):
                             quit = True
                             break
-                        if not self.continue_looping:
-                            quit = True
-                            break
+                        # if not self.continue_looping:
+                        #     quit = True
+                        #     break
                     if quit:
                         break
                 if quit:
@@ -333,20 +361,21 @@ class Battle(tk.Frame):
         self.controller.show_page("HomePage")
     
     def cleanup(self):
-        self.selection = {
-            "dance-moves": False,
-            "floss-new": False,
-            "gangnam-style": False,
-            "get-griddy": False,
-            "orange-justice": False,
-            "take-the-l": False,
-        }
-        if self.thread is not None:
-            self.thread.join(timeout=2)
+        # self.selection = {
+        #     "dance-moves": False,
+        #     "floss-new": False,
+        #     "gangnam-style": False,
+        #     "get-griddy": False,
+        #     "orange-justice": False,
+        #     "take-the-l": False,
+        # }
+        self.thread.stop()
+        self.frame_counter = len(self.current_dance.video_frames) + 2
+        # if self.thread is not None:
+        #     self.thread.join(timeout=2)
         self.dances.clear()
         for label in self.selection_labels:
             label.pack_forget()
         self.selection_labels.clear()
-        if hasattr(self, 'cap') and self.cap.isOpened():
-            self.cap.release()
+        self.current_count = 3
         cv2.destroyAllWindows()

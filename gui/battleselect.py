@@ -68,6 +68,13 @@ class BattleSelect(tk.Frame):
         back_btn.pack(anchor=tk.S, pady=(0,30), side=tk.BOTTOM)
 
     def start_battle(self):
+        selection_made = False
+        for key in self.selection.keys():
+            if self.selection[key]:
+                selection_made = True
+                break 
+        if not selection_made:
+            return
         # stop music
         self.controller.stop_music()
         # Logic to start the battle with selected dances
