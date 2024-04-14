@@ -3,6 +3,7 @@ import cv2
 from ultralytics import YOLO
 import time
 from PIL import Image, ImageTk
+import threading
 
 import pose_keypoints as pk
 import dance_comparison_helpers as dch
@@ -47,6 +48,13 @@ class Battle(tk.Frame):
         self.selected_dances_title.pack(side=tk.TOP)
         self.selection_labels = []
 
+        # countdown
+        self.current_count = 3
+        self.countdown_bar = tk.Frame(self.side_bar)
+        self.countdown_bar.pack()
+        self.countdown_bar_label = tk.Label(self.countdown_bar, text=str(self.current_count), font=("Terminal", 20))
+        self.countdown_bar_label.pack()
+
         # buttons
         self.buttons_bar = tk.Frame(self.side_bar)
         self.buttons_bar.pack(side=tk.BOTTOM, pady=(20, 30))
@@ -71,7 +79,7 @@ class Battle(tk.Frame):
             "score_timing" : 3
         }
         self.body = dch.init_body_v2()
-        self.model = YOLO("../yolov8n-pose.pt")
+        self.model = YOLO("./yolov8n-pose.pt")
         self.players = [
             {
                 "name" : "Player 1",
@@ -86,8 +94,9 @@ class Battle(tk.Frame):
         ]
         
         # cv2 stuff
-        self.camera_stuff = dch.init_camera(0) # init webcam
+        self.camera_stuff = dch.init_camera_v2(self.controller) # init webcam
         self.cap = self.camera_stuff["cap"]
+        # self.cap = cv2.VideoCapture(0)
         self.window_caption = "Dance Planet"
         self.font = cv2.FONT_HERSHEY_SIMPLEX
         self.frame_counter = 0
@@ -112,11 +121,13 @@ class Battle(tk.Frame):
 
     def begin_battle(self):
         self.continue_looping = True
-        self.game_loop()
+        threading.Thread(target=self.game_loop, daemon=True).start()
 
-    # def frame_process(self):
+    def gui_update(self, frames):
+        self.after(0, self.update_labels, frames)
 
-    def update_video_streams(self, web_frame, vid_frame):
+    def update_labels(self, frames):
+        web_frame, vid_frame = frames
         web_frame = cv2.cvtColor(web_frame, cv2.COLOR_BGR2RGB)
         web_frame = Image.fromarray(web_frame)
         web_frame = web_frame.resize((320, 240))
@@ -137,9 +148,14 @@ class Battle(tk.Frame):
         self.player1ScoreLabel.config(text=f"Player 1 Score : {p1_score}")
         self.player2ScoreLabel.config(text=f"Player 2 Score : {p2_score}")
 
+        # update countdown if applicable
+        self.countdown_bar_label.config(text=str(self.current_count))
+
     def game_loop(self):
         quit = False
         for dance in self.dances:
+
+            print(f"On dance {dance.name}")
 
             # get dance data
             threshold = dance.threshold
@@ -155,6 +171,9 @@ class Battle(tk.Frame):
             video_frames_right_bound = len(video_frames) - 1
 
             for i, player in enumerate(self.players):
+
+                print("On " + str(player["name"]))
+
                 # init
                 last_score_time = time.time()
                 self.frame_counter = 0
@@ -173,21 +192,24 @@ class Battle(tk.Frame):
                         elapsed_time = time.time() - start_time
                         
                         # Update the countdown
-                        current_count = self.countdown - int(elapsed_time)
-                        if current_count < 0:
+                        self.current_count = self.countdown - int(elapsed_time)
+                        if self.current_count < 0:
                             # end countdown if reaches end time (less than 0)
                             break
                         
                         # Put the countdown text on the frame
-                        cv2.putText(frame, str(current_count), (50, 50), self.font, 2, (255, 0, 0), 3, cv2.LINE_AA)
+                        cv2.putText(frame, str(self.current_count), (50, 50), self.font, 2, (255, 0, 0), 3, cv2.LINE_AA)
 
                         # Display the resulting frame
                         cv2.putText(frame, player["cd_message"], (50, 100), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
-                        self.update_video_streams(frame, video_frames[self.frame_counter])
+                        # self.update_labels(frame, video_frames[self.frame_counter])
+                        self.gui_update((frame, video_frames[self.frame_counter]))
 
                         # Break the loop with 'Q' key
                         if cv2.waitKey(100) & 0xFF == ord('q'):
                             break
+
+                print("finished countdown")
 
                 while self.cap.isOpened():
                     ret, frame = self.cap.read()
@@ -236,7 +258,8 @@ class Battle(tk.Frame):
 
                     # true display
                     cv2.putText(source_frame, caption, (50, 100), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
-                    self.update_video_streams(frame, source_frame)
+                    # self.update_labels(frame, source_frame)
+                    self.gui_update((frame, source_frame))
 
                     #increment
                     self.frame_counter += 1
@@ -254,10 +277,6 @@ class Battle(tk.Frame):
                     break
             if quit:
                 break
-        
-        # When everything is done, release the capture
-        self.cap.release()
-        cv2.destroyAllWindows()
 
         # go to results page?
 

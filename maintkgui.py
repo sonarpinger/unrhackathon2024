@@ -1,5 +1,6 @@
 import cv2
 import tkinter as tk
+import cv2
 
 from gui import HomePage, Practice, Battle, DanceSelect, BattleSelect
 from choreography import Choreography
@@ -14,6 +15,8 @@ class MainMenu(tk.Tk):
 
         self.title("Main Menu")
         self.geometry("1920x1080")
+
+        self.cap = cv2.VideoCapture(0)
 
         # expand frame to fill window
         self.container = tk.Frame(self)
@@ -56,7 +59,13 @@ class MainMenu(tk.Tk):
         if page:
             page.load_selection(selection, list_of_dances)
             page.tkraise()
+    
+    def cleanup(self):
+        self.cap.release()
+        cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     app = MainMenu()
     app.mainloop()
+    app.cleanup()
+    
