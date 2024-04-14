@@ -15,29 +15,28 @@ import data_helpers as dh
 import error_detection as ed
 import pose_keypoints as pk
 import dance_comparison_helpers as dch
+from choreography import Choreography
 
-def dance_comparison(source_dance : str, test_dance, error_parameters, flags) -> dict:
+def dance_comparison(source_dance : Choreography, test_dance, flags) -> dict:
     """
     Args:
         - 
         - test_dance: either 0 (for webcam) or string of filepath to test dance
     """
     
-    threshold = error_parameters["threshold"]
-    above_ratio = error_parameters["above_ratio"]
-    below_ratio = error_parameters["below_ratio"]
-    temporal_size = error_parameters["temporal_size"]
-    sma_window = error_parameters["sma_window"]
-    song_min_error = error_parameters["min_error"]
-    song_max_error = error_parameters["max_error"]
-    score_timing = error_parameters["score_timing"]
+    threshold = source_dance.threshold
+    above_ratio = source_dance.above_ratio
+    below_ratio = source_dance.below_ratio
+    temporal_size = source_dance.temporal_size
+    sma_window = source_dance.sma_window
+    song_min_error = source_dance.min_error
+    song_max_error = source_dance.max_error
+    score_timing = source_dance.score_timing
 
     test_string = type(test_dance) == str
 
-    csv_fp = f"./data/full_csvs/{source_dance}.csv"
-    keys_df = dh.load_csv_from_file(csv_fp)
-    video_fp = f"./data/test_videos/{source_dance}.mp4"
-    video_frames = dh.load_video_from_file(video_fp)
+    keys_df = source_dance.df
+    video_frames = source_dance.video_frames
     video_frames_right_bound = len(video_frames) - 1 # assumes keypoints df and video_frames are aligned (as they are from the same source material) keypoint csv capture is at 25 fps right now and video frame output is at 25 fps
 
     model = YOLO("yolov8n-pose.pt")
@@ -129,8 +128,8 @@ def dance_comparison(source_dance : str, test_dance, error_parameters, flags) ->
         if current_time - last_score_time >= score_timing:  # Check if one second has passed
             score = ed.error_to_score(song_min_error, song_max_error, error_adjusted)  # Run the function
             total_score += score
-            cv2.putText(source_frame, f"+{score} points!", (250, 50), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
-            last_time_run = current_time  # Reset the last run time
+            cv2.putText(source_frame, f"+{int(score)} points!", (250, 50), font, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            last_score_time = current_time  # Reset the last run time
 
         # display on screen
         caption = f"Error: {error_adjusted}"
