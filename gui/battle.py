@@ -8,7 +8,7 @@ import threading
 import pose_keypoints as pk
 import dance_comparison_helpers as dch
 import data_helpers as dh
-import battle_mode_helpers as bmh
+import practice_mode_helpers as bmh
 import error_detection as ed
 from choreography import Choreography
 

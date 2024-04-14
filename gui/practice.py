@@ -3,6 +3,13 @@ import cv2
 from PIL import Image, ImageTk
 from gui.geterror import DanceError
 
+import pose_keypoints as pk
+import dance_comparison_helpers as dch
+import data_helpers as dh
+import practice_mode_helpers as bmh
+import error_detection as ed
+from choreography import Choreography
+
 class Practice(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
@@ -29,6 +36,8 @@ class Practice(tk.Frame):
         self.video_label.place(x=320, y=25, width=1440, height=960)
         self.webcam_video_label = tk.Label(self)
         self.webcam_video_label.place(x=320, y=25, width=320, height=240)
+
+        self.countdown = 5
 
     def update_video_streams(self):
         ret1, web_frame = self.capture_webcam.read()
