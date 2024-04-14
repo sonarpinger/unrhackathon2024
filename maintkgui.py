@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from gui import HomePage, Practice, Battle, DanceSelect
+from gui import HomePage, Practice, Battle, DanceSelect, BattleSelect
 from choreography import Choreography
 
 choreography_file_path = "./data/choreographies/chors.csv"
@@ -22,7 +22,7 @@ class MainMenu(tk.Tk):
         self.container.grid_columnconfigure(0, weight=1)
 
         self.pages = {}
-        for PageClass in [HomePage, Practice, Battle, DanceSelect]:
+        for PageClass in [HomePage, Practice, Battle, DanceSelect, BattleSelect]:
             page_name = PageClass.__name__
             self.pages[page_name] = PageClass(self.container, self)
             self.pages[page_name].grid(row=0, column=0, sticky="nsew")

@@ -14,7 +14,7 @@ class HomePage(tk.Frame):
         label2.image = image
         label2.pack(pady=(20,0))
 
-        btn1 = tk.Button(self, text="Battle Mode", font=("Terminal", 18), bg="#A020F0", command=lambda: controller.show_page("Battle"))
+        btn1 = tk.Button(self, text="Battle Mode", font=("Terminal", 18), bg="#A020F0", command=lambda: controller.show_page("BattleSelect"))
         btn1.pack(anchor=tk.S, padx=(200, 10), pady=(0,30), side=tk.LEFT, expand=True)
 
         btn2 = tk.Button(self, text="Practice Mode", font=("Terminal", 18), bg="#A020F0", command=lambda: controller.show_page("DanceSelect"))
