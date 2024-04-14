@@ -3,6 +3,41 @@
 # File: Pose Keypoints
 # Description: module for extracting pose from keypoints and normalizing them
 
+def horizontal_body_flip(frame_stuff : dict, body : list) -> list:
+    """
+    performs a horizontal flip transformation on the body based on frame structure
+    args:
+        - frame_stuff {
+                "norm_box_dimensions" : (x, y)
+                ...
+            }
+        - list of limb vectors [ [[x1, y1], [x2, y2]] , ...] where xi, yi lie within norm box dimensions
+    returns:
+        - flipped_body which is a horizontal flip of the body list based on the norm box dimensions 
+    """
+    # Extract the width of the normalization box
+    norm_box_width, _ = frame_stuff["norm_box_dimensions"]
+
+    # Calculate the horizontal midpoint of the normalization box
+    horizontal_midpoint = norm_box_width // 2
+
+    # Initialize the list for the flipped body
+    flipped_body = []
+
+    # Loop over each limb in the body
+    for limb in body:
+        flipped_limb = []
+        for point in limb:
+            x, y = point
+            # Flip the y-coordinate
+            flipped_x = 2 * horizontal_midpoint - x
+            # Append the flipped point to the flipped limb
+            flipped_limb.append([flipped_x, y])
+        # Append the flipped limb to the flipped body
+        flipped_body.append(flipped_limb)
+
+    return flipped_body
+
 
 def body_normalize(frame_stuff : dict, model_stuff : dict, body : list) -> list:
     """

@@ -114,3 +114,47 @@ def usable_keypoints(keypoints_list : list) -> list:
         [left_leg_start, left_leg_end]
     ]
     return body
+
+def usable_keypoints_v2(keypoints_list : list) -> list:
+    """
+    Move row keypoints from their dataframe format to something usable from the error function
+    Format:
+    'right_upper_arm_start_x', 'right_upper_arm_start_y', 'right_upper_arm_end_x', 'right_upper_arm_end_y', 
+    'right_forearm_start_x', 'right_forearm_start_y', 'right_forearm_end_x', 'right_forearm_end_y', 
+    'left_upper_arm_start_x', 'left_upper_arm_start_y', 'left_upper_arm_end_x', 'left_upper_arm_end_y', 
+    'left_forearm_start_x', 'left_forearm_start_y', 'left_forearm_end_x', 'left_forearm_end_y',
+    'right_quad_start_x', 'right_quad_start_y', 'right_quad_end_x', 'right_quad_end_y', 
+    'right_calf_start_x', 'right_calf_start_y', 'right_calf_end_x', 'right_calf_end_y', 
+    'left_quad_start_x', 'left_quad_start_y', 'left_quad_end_x', 'left_quad_end_y',
+    'left_calf_start_x', 'left_calf_start_y', 'left_calf_end_x', 'left_calf_end_y'
+    """
+    # extract starts/ends of limb vectors
+    right_upper_arm_start = [keypoints_list[0], keypoints_list[1]]
+    right_upper_arm_end = [keypoints_list[2], keypoints_list[3]]
+    right_forearm_start = [keypoints_list[4], keypoints_list[5]]
+    right_forearm_end = [keypoints_list[6], keypoints_list[7]]
+    left_upper_arm_start = [keypoints_list[8], keypoints_list[9]]
+    left_upper_arm_end = [keypoints_list[10], keypoints_list[11]]
+    left_forearm_start = [keypoints_list[12], keypoints_list[13]]
+    left_forearm_end = [keypoints_list[14], keypoints_list[15]]
+    right_quad_start = [keypoints_list[16], keypoints_list[17]]
+    right_quad_end = [keypoints_list[18], keypoints_list[19]]
+    right_calf_start = [keypoints_list[20], keypoints_list[21]]
+    right_calf_end = [keypoints_list[22], keypoints_list[23]]
+    left_quad_start = [keypoints_list[24], keypoints_list[25]]
+    left_quad_end = [keypoints_list[26], keypoints_list[27]]
+    left_calf_start = [keypoints_list[28], keypoints_list[29]]
+    left_calf_end = [keypoints_list[30], keypoints_list[31]]
+
+    # put into body
+    body = [
+        [right_upper_arm_start, right_upper_arm_end],
+        [right_forearm_start, right_forearm_end],
+        [left_upper_arm_start, left_upper_arm_end],
+        [left_forearm_start, left_forearm_end],
+        [right_quad_start, right_quad_end],
+        [right_calf_start, right_calf_end],
+        [left_quad_start, left_quad_end],
+        [left_calf_start, left_calf_end]
+    ]
+    return body
