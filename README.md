@@ -63,3 +63,5 @@ python -m pip install pyside6
 - [ ] Standardize Source Material 
 
 - [ ] Results Screen at the end of dance run
+
+- [ ] fix threading problem
