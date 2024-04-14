@@ -34,7 +34,7 @@ class Battle(tk.Frame):
 
         self.selection = {
             "dance-moves": False,
-            "floss-new": False,
+            "floss": False,
             "gangnam-style": False,
             "get-griddy": False,
             "orange-justice": False,
@@ -373,7 +373,7 @@ class Battle(tk.Frame):
     def cleanup(self):
         # self.selection = {
         #     "dance-moves": False,
-        #     "floss-new": False,
+        #     "floss": False,
         #     "gangnam-style": False,
         #     "get-griddy": False,
         #     "orange-justice": False,

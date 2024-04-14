@@ -8,7 +8,7 @@ class BattleSelect(tk.Frame):
         # For holding battle selection
         self.selection = {
             "dance-moves": False,
-            "floss-new": False,
+            "floss": False,
             "gangnam-style": False,
             "get-griddy": False,
             "orange-justice": False,
@@ -35,7 +35,7 @@ class BattleSelect(tk.Frame):
         self.dance_frames = {}
         self.buttons = {}
         self.labels = {}
-        dances = ["dance-moves", "floss-new", "gangnam-style", "get-griddy", "orange-justice", "take-the-l"]
+        dances = ["dance-moves", "floss", "gangnam-style", "get-griddy", "orange-justice", "take-the-l"]
         images = [self.defaultDance, self.flossDance, self.gangnamDance, self.griddyDance, self.orangeDance, self.takeTheL]
 
         for i, dance in enumerate(dances):
@@ -82,7 +82,7 @@ class BattleSelect(tk.Frame):
         # reset after passing
         self.selection = {
             "dance-moves": False,
-            "floss-new": False,
+            "floss": False,
             "gangnam-style": False,
             "get-griddy": False,
             "orange-justice": False,
@@ -93,7 +93,7 @@ class BattleSelect(tk.Frame):
         # reset when leaving menu
         self.selection = {
             "dance-moves": False,
-            "floss-new": False,
+            "floss": False,
             "gangnam-style": False,
             "get-griddy": False,
             "orange-justice": False,
@@ -112,7 +112,7 @@ class BattleSelect(tk.Frame):
     def init_selection(self):
         self.selection = {
             "dance-moves": False,
-            "floss-new": False,
+            "floss": False,
             "gangnam-style": False,
             "get-griddy": False,
             "orange-justice": False,
