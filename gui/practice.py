@@ -306,6 +306,7 @@ class Practice(tk.Frame):
             if quit:
                 break
         # go to results page?
+        self.controller
 
 
     def loop_pause(self):
@@ -315,6 +316,7 @@ class Practice(tk.Frame):
 
     def back_to_home(self):
         self.continue_looping = False
+        self.cleanup()
         self.controller.play_menu_music()
         self.controller.show_page("HomePage")
 
