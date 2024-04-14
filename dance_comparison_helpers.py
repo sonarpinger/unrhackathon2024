@@ -71,7 +71,7 @@ def init_camera_v2(controller):
     frame_height = int(cap.get(4)) # get window height
 
     # set fps
-    cap.set(cv2.CAP_PROP_FPS, dh.FRAME_RATE)
+    #cap.set(cv2.CAP_PROP_FPS, dh.FRAME_RATE)
 
     # normalization window
     norm_box_width = 200
@@ -101,7 +101,7 @@ def init_camera_v2(controller):
         frame_height - gap # top
     ]
     stuff = {
-        "cap" : cap,
+        "cap" : 0,
         "norm_box_0" : norm_box_0,
         "norm_box_1" : norm_box_1,
         "norm_box_2" : norm_box_2,

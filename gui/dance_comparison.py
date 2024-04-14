@@ -40,7 +40,7 @@ def dance_comparison(source_dance : Choreography, test_dance, flags) -> dict:
 
     model = YOLO("yolov8n-pose.pt")
 
-    camera_stuff = dch.init_camera(test_dance)
+    camera_stuff = dch.init_camera()
     cap = camera_stuff["cap"]
     window_caption = "Dance Planet"
     font = cv2.FONT_HERSHEY_SIMPLEX
