@@ -42,6 +42,7 @@ class Practice(tk.Frame):
         #}
 
         #self.dances = []
+        self.dance = None
 
         #side bar to show labels
         self.side_bar = tk.Frame(self)
