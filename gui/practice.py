@@ -306,6 +306,7 @@ class Practice(tk.Frame):
             if quit:
                 break
         # go to results page?
+        self.controller
 
 
     def loop_pause(self):
