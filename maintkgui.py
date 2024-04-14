@@ -51,6 +51,12 @@ class MainMenu(tk.Tk):
         #dance = self.pages.get(dance_name)
         #if dance:
         #    dance.tkraise()
+    
+    def pass_dance_selection(self, selection):
+        page = self.pages.get("Battle")
+        if page:
+            page.load_selection(selection)
+            page.tkraise()
 
 if __name__ == "__main__":
     app = MainMenu()

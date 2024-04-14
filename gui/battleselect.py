@@ -69,9 +69,19 @@ class BattleSelect(tk.Frame):
 
     def start_battle(self):
         # Logic to start the battle with selected dances
-        pass
+        self.controller.pass_dance_selection(self.selection)
+        # reset after passing
+        self.selection = {
+            "default": False,
+            "floss": False,
+            "gangnam": False,
+            "griddy": False,
+            "orange": False,
+            "takethel": False,
+        }
 
     def back_to_home(self):
+        # reset when leaving menu
         self.selection = {
             "default": False,
             "floss": False,
@@ -89,5 +99,13 @@ class BattleSelect(tk.Frame):
         self.selection[option] = not self.selection[option]
         # Update the label based on the current state
         self.labels[option].config(text="Selected" if self.selection[option] else "Not Selected")
-
-# Note: You might need to adjust the spacing and layout parameters to better fit your GUI design.
+    
+    def init_selection(self):
+        self.selection = {
+            "default": False,
+            "floss": False,
+            "gangnam": False,
+            "griddy": False,
+            "orange": False,
+            "takethel": False,
+        }

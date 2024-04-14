@@ -25,3 +25,8 @@ class HomePage(tk.Frame):
 
         #btn4= tk.Button(self, text="Testing Video", font=("Terminal", 18), bg="#A020F0", command=lambda: controller.show_page("VideoPage"))
         #btn4.pack(anchor=tk.S, padx=(10, 200), pady=(0,30), side=tk.LEFT, expand=True)
+    
+    def go_to_battle_select(self):
+        page = self.pages.get("BattleSelect")
+        page.init_selection()
+        self.controller.show_page("BattleSelect")
