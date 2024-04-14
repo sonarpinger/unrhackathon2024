@@ -55,7 +55,7 @@ class MainMenu(tk.Tk):
     def pass_dance_selection(self, selection):
         page = self.pages.get("Battle")
         if page:
-            page.load_selection(selection)
+            page.load_selection(selection, list_of_dances)
             page.tkraise()
 
 if __name__ == "__main__":

@@ -7,12 +7,12 @@ class BattleSelect(tk.Frame):
 
         # For holding battle selection
         self.selection = {
-            "default": False,
-            "floss": False,
-            "gangnam": False,
-            "griddy": False,
-            "orange": False,
-            "takethel": False,
+            "dance-moves": False,
+            "floss-new": False,
+            "gangnam-style": False,
+            "get-griddy": False,
+            "orange-justice": False,
+            "take-the-l": False,
         }
 
         label = tk.Label(self, text="Battle Select", font=("Terminal", 88), bg="#A020F0", fg="#FFFFFF")
@@ -35,7 +35,7 @@ class BattleSelect(tk.Frame):
         self.dance_frames = {}
         self.buttons = {}
         self.labels = {}
-        dances = ["default", "floss", "gangnam", "griddy", "orange", "takethel"]
+        dances = ["dance-moves", "floss-new", "gangnam-style", "get-griddy", "orange-justice", "take-the-l"]
         images = [self.defaultDance, self.flossDance, self.gangnamDance, self.griddyDance, self.orangeDance, self.takeTheL]
 
         for i, dance in enumerate(dances):
@@ -72,23 +72,23 @@ class BattleSelect(tk.Frame):
         self.controller.pass_dance_selection(self.selection)
         # reset after passing
         self.selection = {
-            "default": False,
-            "floss": False,
-            "gangnam": False,
-            "griddy": False,
-            "orange": False,
-            "takethel": False,
+            "dance-moves": False,
+            "floss-new": False,
+            "gangnam-style": False,
+            "get-griddy": False,
+            "orange-justice": False,
+            "take-the-l": False,
         }
 
     def back_to_home(self):
         # reset when leaving menu
         self.selection = {
-            "default": False,
-            "floss": False,
-            "gangnam": False,
-            "griddy": False,
-            "orange": False,
-            "takethel": False,
+            "dance-moves": False,
+            "floss-new": False,
+            "gangnam-style": False,
+            "get-griddy": False,
+            "orange-justice": False,
+            "take-the-l": False,
         }
         for option in self.selection.keys():
             self.labels[option].config(text="Selected" if self.selection[option] else "Not Selected")
@@ -102,10 +102,10 @@ class BattleSelect(tk.Frame):
     
     def init_selection(self):
         self.selection = {
-            "default": False,
-            "floss": False,
-            "gangnam": False,
-            "griddy": False,
-            "orange": False,
-            "takethel": False,
+            "dance-moves": False,
+            "floss-new": False,
+            "gangnam-style": False,
+            "get-griddy": False,
+            "orange-justice": False,
+            "take-the-l": False,
         }

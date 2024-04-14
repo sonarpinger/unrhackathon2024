@@ -108,7 +108,7 @@ def dance_comparison(source_dance : Choreography, test_dance, flags) -> dict:
         # add horizontal flip of keypoints if on webcam
         if not test_string:
             norm_body = pk.horizontal_body_flip(camera_stuff, norm_body)
-
+        
         temporal_left_bound = frame_counter - temporal_size if frame_counter - temporal_size >= 0 else 0
         temporal_right_bound = frame_counter + temporal_size if frame_counter + temporal_size <= video_frames_right_bound else video_frames_right_bound
         temporal_frame_range = [temporal_left_bound, temporal_right_bound]
