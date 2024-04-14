@@ -3,7 +3,7 @@ import tkinter as tk
 import cv2
 import pygame
 
-from gui import HomePage, Practice, Battle, DanceSelect, BattleSelect
+from gui import HomePage, Practice, Battle, DanceSelect, BattleSelect, Results
 from choreography import Choreography
 
 choreography_file_path = "./data/choreographies/chors.csv"
@@ -31,7 +31,7 @@ class MainMenu(tk.Tk):
         self.webcam_frame.set(cv2.CAP_PROP_FPS, 25)
 
         self.pages = {}
-        for PageClass in [HomePage, Practice, Battle, DanceSelect, BattleSelect]:
+        for PageClass in [HomePage, Practice, Battle, DanceSelect, BattleSelect, Results]:
             page_name = PageClass.__name__
             self.pages[page_name] = PageClass(self.container, self)
             self.pages[page_name].grid(row=0, column=0, sticky="nsew")
@@ -66,6 +66,12 @@ class MainMenu(tk.Tk):
         page = self.pages.get("Battle")
         if page:
             page.load_selection(selection, list_of_dances)
+            page.tkraise()
+    
+    def pass_results_data(self, data):
+        page = self.pages.get("Results")
+        if page:
+            page.load_stats(data)
             page.tkraise()
     
     def load_and_play_music(self, music_path):

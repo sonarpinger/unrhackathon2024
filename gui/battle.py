@@ -69,8 +69,11 @@ class Battle(tk.Frame):
         # video display labels
         self.video_label = tk.Label(self)
         self.video_label.place(x=320, y=25, width=1440, height=960)
-        self.webcam_video_label = tk.Label(self)
-        self.webcam_video_label.place(x=320, y=25, width=1500, height=240)
+        self.webcam_widget = tk.Frame(self)
+        self.webcam_widget.pack(side=tk.TOP, anchor=tk.NE, padx=10, pady=10)
+        self.webcam_video_label = tk.Label(self.webcam_widget)
+        # self.webcam_video_label.place(x=320, y=25, width=1500, height=240)
+        self.webcam_video_label.pack()
 
         # game loop stuff
         self.flags = {
@@ -170,7 +173,8 @@ class Battle(tk.Frame):
     def game_loop(self):
         while self.continue_looping:
             quit = False
-            for dance in self.dances:
+            results = False
+            for d, dance in enumerate(self.dances):
 
                 print(f"On dance {dance.name}")
 
@@ -287,6 +291,8 @@ class Battle(tk.Frame):
 
                         # end if frame_counter reaches end
                         if self.frame_counter >= video_frames_right_bound:
+                            if i >= len(self.players) - 1 and d >= len(self.dances) - 1:
+                                results = True
                             break
 
                         # break loop if q
@@ -302,7 +308,16 @@ class Battle(tk.Frame):
                     break
 
             # go to results page?
-
+            if results:
+                self.continue_looping = False
+                self.cleanup()
+                self.controller.play_menu_music()
+                results_dir = {
+                    "mode" : "battle",
+                    "p1_score" : self.players[0]["score"],
+                    "p2_score" : self.players[1]["score"],
+                }
+                self.controller.pass_results_data()
 
     def loop_pause(self):
         self.continue_looping = not self.continue_looping
