@@ -186,7 +186,7 @@ window_caption = "Dance Planet"
 body = init_body_v2()
 
 # error params
-threshold = 10
+threshold = 450
 above_ratio = 5.0
 below_ratio = 1.0
 
@@ -223,12 +223,13 @@ while cd and cap.isOpened():
     cv2.imshow(window_caption, frame)
 
     # Break the loop with 'Q' key
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(100) & 0xFF == ord('q'):
         break
 
 # for analytics
 analytics = True
 error_over_time = []
+frames = []
 
 # limb view
 limb_view = True
@@ -250,7 +251,7 @@ while cap.isOpened():
 
     # error calculation
     # setup temporal range
-    temporal_size = 5 # establishes a range of (n - temporal_size, n + temporal_size) working on frame n to calculate error on
+    temporal_size = 25 # establishes a range of (n - temporal_size, n + temporal_size) working on frame n to calculate error on
     temporal_left_bound = frame_counter - temporal_size if frame_counter - temporal_size >= 0 else 0
     temporal_right_bound = frame_counter + temporal_size if frame_counter + temporal_size <= video_frames_right_bound else video_frames_right_bound
     temporal_frame_range = [temporal_left_bound, temporal_right_bound]
@@ -263,6 +264,10 @@ while cap.isOpened():
     error = ed.min_temporal_pose_error(source_bodies_usable, norm_body, threshold, above_ratio, below_ratio)
     error_over_time.append(error)
 
+    # display on screen
+    caption = f"Error: {error}"
+    source_frame = video_frames[frame_counter]
+
     # analytics screen
     if analytics:
         time_indices = list(range(frame_counter + 1))
@@ -274,10 +279,6 @@ while cap.isOpened():
         analytics_caption = "error over time"
         cv2.imshow(analytics_caption, chart)
         plt.close()
-
-    # display on screen
-    caption = f"Error: {error}"
-    source_frame = video_frames[frame_counter]
 
     if limb_view:
         add_limbs_to_frame(norm_body, camera_stuff["norm_box_1"], source_frame)
@@ -299,6 +300,7 @@ while cap.isOpened():
 
     #increment
     frame_counter += 1
+    frames.append(source_frame)
 
     # end if frame_counter reaches end
     if frame_counter == video_frames_right_bound + 1:
