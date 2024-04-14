@@ -12,12 +12,14 @@ class Choreography:
     root_csv_path = "./data/full_csvs/"
     root_video_path = "./data/test_videos/"
     root_icon_path = "./data/icons/"
+    root_sound_path = "./data/sound/"
 
     def __init__(self, name : str, threshold : float, above_ratio : float, below_ratio : float, temporal_size : int, sma_window : int, min_error : float, max_error : float, score_timing : int):
         self.name = name
         self.csv_path = self.root_csv_path + self.name + ".csv"
         self.mp4_path = self.root_video_path + self.name + ".mp4"
         self.icon_path = self.root_icon_path + self.name + ".png"
+        self.mp3_path = self.root_sound_path + self.name + ".mp3"
         self.threshold = threshold
         self.above_ratio = above_ratio
         self.below_ratio = below_ratio
