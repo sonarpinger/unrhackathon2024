@@ -28,6 +28,10 @@ class MainMenu(tk.Tk):
         page = self.pages.get(page_name)
         if page:
             page.tkraise()
+    def show_dance(self, dance_name):
+        dance = self.pages.get(dance_name)
+        if dance:
+            dance.tkraise()
 
 if __name__ == "__main__":
     app = MainMenu()
