@@ -28,7 +28,7 @@ class Practice(tk.Frame):
         self.video_label.place(x=320, y=25, width=1440, height=960)
         self.webcam_video_label = tk.Label(self)
         self.webcam_video_label.place(x=320, y=25, width=320, height=240)
-        self.capture_webcam = cv2.VideoCapture(0)
+        self.capture_webcam = self.controller.cap
         self.capture_video = cv2.VideoCapture('gui/assets/videos/flossslow.mp4')
 
     def update_video_streams(self):

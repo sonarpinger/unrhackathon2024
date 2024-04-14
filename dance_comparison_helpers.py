@@ -12,12 +12,61 @@ import error_detection as ed
 import pose_keypoints as pk
 
 # helper functions 
-def init_camera(capture):
+def init_camera():
     """
     capture is either 0 or fp to video for comparison
     """
     # streaming window
-    cap = cv2.VideoCapture(capture)
+    cap = cv2.VideoCapture(0)
+    frame_width = int(cap.get(3)) # get window width
+    frame_height = int(cap.get(4)) # get window height
+
+    # set fps
+    cap.set(cv2.CAP_PROP_FPS, dh.FRAME_RATE)
+
+    # normalization window
+    norm_box_width = 200
+    norm_box_height = 300
+    mid_width = frame_width // 2
+    mid_height = frame_height // 2
+    gap = 15
+
+    norm_box_0 = [
+        (frame_width - norm_box_width) // 2, # left bound
+        (frame_height - norm_box_height) // 2, # bottom bound , or top bound?
+        (frame_width + norm_box_width) // 2, # right bound 
+        (frame_height + norm_box_height) // 2, # top bound, or bototm boudn?
+    ]
+    start_x = mid_width - norm_box_width
+    bottom_y = frame_height - norm_box_height
+    norm_box_1 = [
+        start_x - gap, # left
+        bottom_y - gap, # bottom
+        start_x - gap + norm_box_width, # right
+        frame_height - gap # top
+    ]
+    norm_box_2 = [
+        start_x + norm_box_width + gap, # left
+        bottom_y - gap, # bottom
+        start_x + gap + norm_box_width * 2,  #ight
+        frame_height - gap # top
+    ]
+    stuff = {
+        "cap" : cap,
+        "norm_box_0" : norm_box_0,
+        "norm_box_1" : norm_box_1,
+        "norm_box_2" : norm_box_2,
+        "frame_dimensions" : (frame_width, frame_height),
+        "norm_box_dimensions" : (norm_box_width, norm_box_height),
+    }
+    return stuff
+
+def init_camera_v2(controller):
+    """
+    capture is either 0 or fp to video for comparison
+    """
+    # streaming window
+    cap = controller.cap
     frame_width = int(cap.get(3)) # get window width
     frame_height = int(cap.get(4)) # get window height
 
