@@ -14,7 +14,7 @@ class HomePage(tk.Frame):
         label2.image = image
         label2.pack(pady=(20,0))
 
-        btn1 = tk.Button(self, text="Battle Mode", font=("Terminal", 18), bg="#A020F0", command=lambda: controller.show_page("Battle"))
+        btn1 = tk.Button(self, text="Battle Mode", font=("Terminal", 18), bg="#A020F0", command=lambda: controller.show_page("BattleSelect"))
         btn1.pack(anchor=tk.S, padx=(200, 10), pady=(0,30), side=tk.LEFT, expand=True)
 
         btn2 = tk.Button(self, text="Practice Mode", font=("Terminal", 18), bg="#A020F0", command=lambda: controller.show_page("DanceSelect"))
@@ -25,3 +25,8 @@ class HomePage(tk.Frame):
 
         #btn4= tk.Button(self, text="Testing Video", font=("Terminal", 18), bg="#A020F0", command=lambda: controller.show_page("VideoPage"))
         #btn4.pack(anchor=tk.S, padx=(10, 200), pady=(0,30), side=tk.LEFT, expand=True)
+    
+    def go_to_battle_select(self):
+        page = self.pages.get("BattleSelect")
+        page.init_selection()
+        self.controller.show_page("BattleSelect")
