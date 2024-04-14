@@ -22,4 +22,4 @@ class DanceError():
     self.model = YOLO("./models/yolov8n-pose.pt")
 
   def get_score(self, webcam_frame):
-    return dc.dance_comparison(self.dance, webcam_frame, {})
+    return dc.dance_comparison(self.dance, webcam_frame, {'countdown': False, 'analytics': False})

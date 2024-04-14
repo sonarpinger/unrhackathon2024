@@ -17,12 +17,14 @@ def init_camera(capture):
     capture is either 0 or fp to video for comparison
     """
     # streaming window
-    cap = cv2.VideoCapture(capture)
-    frame_width = int(cap.get(3)) # get window width
-    frame_height = int(cap.get(4)) # get window height
+    #cap = cv2.VideoCapture(capture)
+    #frame_width = int(cap.get(3)) # get window width
+    #frame_height = int(cap.get(4)) # get window height
+    frame_width = 640
+    frame_height = 480
 
     # set fps
-    cap.set(cv2.CAP_PROP_FPS, dh.FRAME_RATE)
+    #cap.set(cv2.CAP_PROP_FPS, dh.FRAME_RATE)
 
     # normalization window
     norm_box_width = 200
@@ -52,7 +54,7 @@ def init_camera(capture):
         frame_height - gap # top
     ]
     stuff = {
-        "cap" : cap,
+        "cap" : 0,
         "norm_box_0" : norm_box_0,
         "norm_box_1" : norm_box_1,
         "norm_box_2" : norm_box_2,

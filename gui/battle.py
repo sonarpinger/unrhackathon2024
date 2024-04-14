@@ -182,7 +182,7 @@ class Battle(tk.Frame):
                         cv2.putText(frame, str(current_count), (50, 50), self.font, 2, (255, 0, 0), 3, cv2.LINE_AA)
 
                         # Display the resulting frame
-                        cv2.putText(frame, player[i]["cd_message"], (50, 100), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
+                        cv2.putText(frame, player["cd_message"], (50, 100), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
                         self.update_video_streams(frame, video_frames[self.frame_counter])
 
                         # Break the loop with 'Q' key

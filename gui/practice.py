@@ -29,8 +29,6 @@ class Practice(tk.Frame):
         self.video_label.place(x=320, y=25, width=1440, height=960)
         self.webcam_video_label = tk.Label(self)
         self.webcam_video_label.place(x=320, y=25, width=320, height=240)
-        self.capture_webcam = cv2.VideoCapture(0)
-        self.capture_webcam.set(cv2.CAP_PROP_FPS, 25)
 
     def update_video_streams(self):
         ret1, web_frame = self.capture_webcam.read()
@@ -107,6 +105,10 @@ class Practice(tk.Frame):
         self.score = 0
         self.capture_video = cv2.VideoCapture(self.mp4_path)
         self.capture_video.set(cv2.CAP_PROP_FPS, 25)
+
+        self.capture_webcam = self.controller.webcam_frame
+        #self.capture_webcam = cv2.VideoCapture(0)
+        #self.capture_webcam.set(cv2.CAP_PROP_FPS, 25)
 
         #pass
 

@@ -1,3 +1,4 @@
+import cv2
 import tkinter as tk
 
 from gui import HomePage, Practice, Battle, DanceSelect, BattleSelect
@@ -19,6 +20,8 @@ class MainMenu(tk.Tk):
         self.container.pack(fill=tk.BOTH, expand=True, side="top", anchor="n")
         self.container.grid_rowconfigure(0, weight=1)
         self.container.grid_columnconfigure(0, weight=1)
+        self.webcam_frame = cv2.VideoCapture(0)
+        self.webcam_frame.set(cv2.CAP_PROP_FPS, 25)
 
         self.pages = {}
         for PageClass in [HomePage, Practice, Battle, DanceSelect, BattleSelect]:
