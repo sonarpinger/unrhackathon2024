@@ -1,9 +1,9 @@
 import tkinter as tk
 import cv2
-from ultralytics import YOLO
 import time
 from PIL import Image, ImageTk
 import threading
+from ultralytics import YOLO
 
 import pose_keypoints as pk
 import dance_comparison_helpers as dch
@@ -12,64 +12,36 @@ import practice_mode_helpers as bmh
 import error_detection as ed
 from choreography import Choreography
 
-class Battle(tk.Frame):
+class Practice(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         self.controller = controller
         self.continue_looping = True
 
-        self.selection = {
-            "dance-moves": False,
-            "floss-new": False,
-            "gangnam-style": False,
-            "get-griddy": False,
-            "orange-justice": False,
-            "take-the-l": False,
-        }
-
-        self.dances = []
-
-        #side bar to show labels
         self.side_bar = tk.Frame(self)
         self.side_bar.pack(side=tk.LEFT, fill=tk.Y)
-
-        # scores label
         self.scores_bar = tk.Frame(self.side_bar)
         self.scores_bar.pack(side=tk.TOP, pady=(30, 50))
-        self.player1ScoreLabel = tk.Label(self.scores_bar, text="Player 1 Score: 0", font=("Terminal", 14))
+        self.player1ScoreLabel = tk.Label(self.scores_bar, text="Score: 0", font=("Terminal", 14))
         self.player1ScoreLabel.pack()
-        self.player2ScoreLabel = tk.Label(self.scores_bar, text="Player 2 Score: 0", font=("Terminal", 14))
-        self.player2ScoreLabel.pack()
+        #self.highScoreLabel = tk.Label(self.side_bar, text="High Score: 0", font=("Terminal", 14))
+        #self.highScoreLabel.pack()
+        self.danceLabel = tk.Label(self.side_bar, text="Dance: ", font=("Terminal", 14))
+        self.danceLabel.pack()
 
-        # selected dances:
-        self.selected_dances_bar = tk.Frame(self.side_bar)
-        self.selected_dances_bar.pack()
-        self.selected_dances_title = tk.Label(self.selected_dances_bar, text = "Selected Dances", font=("Terminal", 14))
-        self.selected_dances_title.pack(side=tk.TOP)
-        self.selection_labels = []
-
-        # countdown
-        self.current_count = 3
-        self.countdown_bar = tk.Frame(self.side_bar)
-        self.countdown_bar.pack()
-        self.countdown_bar_label = tk.Label(self.countdown_bar, text=str(self.current_count), font=("Terminal", 20))
-        self.countdown_bar_label.pack()
-
-        # buttons
-        self.buttons_bar = tk.Frame(self.side_bar)
-        self.buttons_bar.pack(side=tk.BOTTOM, pady=(20, 30))
-        self.endbutton = tk.Button(self.side_bar, text="End Battle", bg="#A020F0", font=("Terminal", 14), command=lambda: self.back_to_home())
+        self.endbutton = tk.Button(self.side_bar, text="End Game", bg="#A020F0", font=("Terminal", 14), command=lambda: self.back_to_home())
         self.endbutton.pack(side=tk.BOTTOM, fill=tk.X)
-        # self.endbutton = tk.Button(self.side_bar, text="Pause Battle", bg="#A020F0", font=("Terminal", 14), command=lambda: self.loop_pause())
-        # self.endbutton.pack(side=tk.BOTTOM, fill=tk.X, pady=(0,20))
-        self.startbutton = tk.Button(self.side_bar, text="Start Battle", bg="#A020F0", font=("Terminal", 14), command=lambda: self.begin_battle())
+        self.endbutton = tk.Button(self.side_bar, text="Restart Game", bg="#A020F0", font=("Terminal", 14), command=lambda: self.loop_reenable())
+        self.endbutton.pack(side=tk.BOTTOM, fill=tk.X, pady=(0,20))
+        self.startbutton = tk.Button(self.side_bar, text="Start Game", bg="#A020F0", font=("Terminal", 14), command=lambda: self.update_video_streams())
         self.startbutton.pack(side=tk.BOTTOM, fill=tk.X, pady=(0,20))
 
-        # video display labels
         self.video_label = tk.Label(self)
         self.video_label.place(x=320, y=25, width=1440, height=960)
         self.webcam_video_label = tk.Label(self)
-        self.webcam_video_label.place(x=320, y=25, width=1500, height=240)
+        self.webcam_video_label.place(x=320, y=25, width=320, height=240)
+
+        self.countdown = 5
 
         # game loop stuff
         self.flags = {
@@ -81,45 +53,6 @@ class Battle(tk.Frame):
         }
         self.body = dch.init_body_v2()
         self.model = YOLO("./yolov8n-pose.pt")
-        self.players = [
-            {
-                "name" : "Player 1",
-                "score" : 0,
-                "cd_message" : "Get ready Player 1!"
-            },
-            {
-                "name" : "Player 2",
-                "score" : 0,
-                "cd_message" : "Get ready Player 2!"
-            }
-        ]
-        
-        # cv2 stuff
-        self.camera_stuff = dch.init_camera_v2(self.controller) # init webcam
-        self.cap = self.camera_stuff["cap"]
-        #print(self.cap)
-        # self.cap = cv2.VideoCapture(0)
-        self.window_caption = "Dance Planet"
-        self.font = cv2.FONT_HERSHEY_SIMPLEX
-        self.frame_counter = 0
-        
-        # countdown 
-        self.countdown = 3
-
-        # analytics
-        self.error_over_time = []
-        self.frames = []
-        self.chart = None
-
-    def load_selection(self, selection, dances : list):
-        self.selection = selection
-        print(f"selection: {self.selection}")
-        for key in self.selection.keys():
-            if self.selection[key]:
-                dance_label = tk.Label(self.selected_dances_bar, text=key, font=("Terminal", 12))
-                dance_label.pack()
-                self.selection_labels.append(dance_label)
-                self.dances.append(Choreography.get_chor_from_chors(key, dances))
 
     def begin_battle(self):
         self.continue_looping = True
@@ -128,11 +61,6 @@ class Battle(tk.Frame):
                 "name" : "Player 1",
                 "score" : 0,
                 "cd_message" : "Get ready Player 1!"
-            },
-            {
-                "name" : "Player 2",
-                "score" : 0,
-                "cd_message" : "Get ready Player 2!"
             }
         ]
         threading.Thread(target=self.game_loop, daemon=True).start()
@@ -159,12 +87,11 @@ class Battle(tk.Frame):
 
         # update scores
         p1_score = self.players[0]["score"]
-        p2_score = self.players[1]["score"]
         self.player1ScoreLabel.config(text=f"Player 1 Score : {int(p1_score)}")
-        self.player2ScoreLabel.config(text=f"Player 2 Score : {int(p2_score)}")
 
         # update countdown if applicable
         self.countdown_bar_label.config(text=str(self.current_count))
+
 
     def game_loop(self):
         quit = False
@@ -296,28 +223,88 @@ class Battle(tk.Frame):
 
         # go to results page?
 
+    def update_video_streams(self):
+        ret1, web_frame = self.capture_webcam.read()
+        ret2, vid_frame = self.capture_video.read()
+        if ret1 and ret2:
+            web_frame = cv2.cvtColor(web_frame, cv2.COLOR_BGR2RGB)
+            web_frame = Image.fromarray(web_frame)
+            web_frame = web_frame.resize((320, 240))
+            self.web_frame = web_frame
+            img_tk = ImageTk.PhotoImage(image=web_frame)
+            self.webcam_video_label.img_tk = img_tk  # Keep reference to avoid garbage collection
+            self.webcam_video_label.config(image=img_tk)
 
-    def loop_pause(self):
-        self.continue_looping = not self.continue_looping
-        # add paused view to this
-        pass
+            vid_frame = cv2.cvtColor(vid_frame, cv2.COLOR_BGR2RGB)
+            vid_frame = Image.fromarray(vid_frame)
+            #vid_frame = vid_frame.resize((1440, 960))
+            img_tk = ImageTk.PhotoImage(image=vid_frame)
+            self.video_label.img_tk = img_tk  # Keep reference to avoid garbage collection
+            self.video_label.config(image=img_tk)
+
+            self.update_score()
+            # cv2.imshow('frame', frame)
+            # cv2.waitKey(1)
+        else:
+            self.capture_video.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        if self.continue_looping:
+            self.webcam_video_label.after(10, self.update_video_streams)
+        else:
+            self.video_label.after_cancel(self.update_video_streams)
+
+    def loop_reenable(self):
+        if not self.continue_looping:
+            self.continue_looping = True
+            self.capture_video.set(cv2.CAP_PROP_POS_FRAMES, 0)
+            self.update_video_streams()
+            self.scoreLabel.config(text="Score: 0")
+
+    def update_score(self):
+        self.score = int(self.danceerror.get_score(self.web_frame))
+        print(self.score)
+        self.scoreLabel.config(text="Score: " + str(self.score))
+        self.scoreLabel.after(1000, self.update_score)
+
+    def load_dance(self, dance):
+        self.danceerror = DanceError(dance)
+        dance_name = dance.name
+        if dance_name == "dance-moves":
+            dance_name = "Default"
+        elif dance_name == "floss-new":
+            dance_name = "Floss"
+        elif dance_name == "gangnam-style":
+            dance_name = "Gangnam Style"
+        elif dance_name == "get-griddy":
+            dance_name = "Griddy"
+        elif dance_name == "orange-justice":
+            dance_name = "Orange Justice"
+        elif dance_name == "take-the-l":
+            dance_name = "Take the L"
+
+        danceLabel = "Dance: " + dance_name
+        self.danceLabel.config(text=danceLabel)
+        self.csv_path = dance.csv_path
+        self.mp4_path = dance.mp4_path
+        self.icon_path = dance.icon_path
+        self.threshold = dance.threshold
+        self.above_ratio = dance.above_ratio
+        self.below_ratio = dance.below_ratio
+        self.temporal_size = dance.temporal_size
+        self.sma_window = dance.sma_window
+        self.min_error = dance.min_error
+        self.max_error = dance.max_error
+        self.score_timing = dance.score_timing
+
+        self.score = 0
+        self.capture_video = cv2.VideoCapture(self.mp4_path)
+        self.capture_video.set(cv2.CAP_PROP_FPS, 25)
+
+        self.capture_webcam = self.controller.webcam_frame
+        #self.capture_webcam = cv2.VideoCapture(0)
+        #self.capture_webcam.set(cv2.CAP_PROP_FPS, 25)
+
+        #pass
 
     def back_to_home(self):
         self.continue_looping = False
-        # reset when leaving menu
-        self.cleanup()
         self.controller.show_page("HomePage")
-    
-    def cleanup(self):
-        self.selection = {
-            "dance-moves": False,
-            "floss-new": False,
-            "gangnam-style": False,
-            "get-griddy": False,
-            "orange-justice": False,
-            "take-the-l": False,
-        }
-        self.dances.clear()
-        for label in self.selection_labels:
-            label.pack_forget()
-        self.selection_labels.clear()

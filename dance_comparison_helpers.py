@@ -101,7 +101,7 @@ def init_camera_v2(controller):
         frame_height - gap # top
     ]
     stuff = {
-        "cap" : 0,
+        "cap" : cap,
         "norm_box_0" : norm_box_0,
         "norm_box_1" : norm_box_1,
         "norm_box_2" : norm_box_2,

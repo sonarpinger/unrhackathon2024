@@ -68,7 +68,7 @@ class MainMenu(tk.Tk):
             page.tkraise()
     
     def load_and_play_music(self, music_path):
-        pygame.mixer.load(music_path)
+        pygame.mixer.music.load(music_path)
         pygame.mixer.music.play(-1)
     
     def stop_music(self):
