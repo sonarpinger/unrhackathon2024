@@ -64,4 +64,4 @@ python -m pip install pyside6
 
 - [ ] Results Screen at the end of dance run
 
-- [ ] fix threading problem
+- [X] fix threading problem

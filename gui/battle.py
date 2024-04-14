@@ -63,7 +63,7 @@ class Battle(tk.Frame):
         self.selection_labels = []
 
         # countdown
-        self.current_count = 3
+        self.current_count = 5
         self.countdown_bar = tk.Frame(self.side_bar)
         self.countdown_bar.pack()
         self.countdown_bar_label = tk.Label(self.countdown_bar, text=str(self.current_count), font=("Terminal", 20))
@@ -234,6 +234,7 @@ class Battle(tk.Frame):
                             self.current_count = self.countdown - int(elapsed_time)
                             if self.current_count < 0:
                                 # end countdown if reaches end time (less than 0)
+                                self.current_count = 0
                                 break
                             
                             # Put the countdown text on the frame
@@ -346,7 +347,7 @@ class Battle(tk.Frame):
                     "p1_score" : self.players[0]["score"],
                     "p2_score" : self.players[1]["score"],
                 }
-                self.controller.pass_results_data()
+                self.controller.pass_results_data(results_dir)
 
     def loop_pause(self):
         self.continue_looping = not self.continue_looping
@@ -373,9 +374,10 @@ class Battle(tk.Frame):
         #     "orange-justice": False,
         #     "take-the-l": False,
         # }
-        self.thread.stop()
+        if self.thread:
+            self.thread.stop()
         self.frame_counter = len(self.current_dance.video_frames) + 2
         # if self.thread is not None:
         #     self.thread.join(timeout=2)
-        self.current_count = 3
+        self.current_count = 5
         # cv2.destroyAllWindows()

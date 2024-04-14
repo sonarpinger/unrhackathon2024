@@ -177,6 +177,7 @@ class Practice(tk.Frame):
 
     def game_loop(self):
         quit = False
+        results = False
 
         print(f"On dance {self.dance.name}")
 
@@ -297,6 +298,7 @@ class Practice(tk.Frame):
 
                 # end if frame_counter reaches end
                 if self.frame_counter == video_frames_right_bound + 1:
+                    results = True
                     break
 
                 # break loop if q
@@ -306,8 +308,16 @@ class Practice(tk.Frame):
             if quit:
                 break
         # go to results page?
-        self.controller
-
+        if results:
+            self.continue_looping = False
+            self.cleanup()
+            self.controller.play_menu_music()
+            results_dir = {
+                "mode" : "practice",
+                "p1_score" : self.players[0]["score"],
+                # "p2_score" : self.players[1]["score"],
+            }
+            self.controller.pass_results_data(results_dir)
 
     def loop_pause(self):
         self.continue_looping = not self.continue_looping

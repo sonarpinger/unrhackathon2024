@@ -118,3 +118,6 @@ class BattleSelect(tk.Frame):
             "orange-justice": False,
             "take-the-l": False,
         }
+        # reset label texts
+        for key in self.labels.keys():
+            self.labels[key].config(text="Not Selected")

@@ -15,12 +15,12 @@ class Results(tk.Frame):
         self.stats_frame = tk.Frame(self)
         self.stats_frame.pack()
         self.mode_label = tk.Label(self.stats_frame)
-        self.p1_score_label = tk.Label(self.stats_frame)
-        self.p2_score_label =  tk.Label(self.stats_frame)
+        self.p1_score_label = tk.Label(self.stats_frame, bg="#A020F0", font=("Terminal", 28))
+        self.p2_score_label =  tk.Label(self.stats_frame, bg="#A020F0", font=("Terminal", 28))
 
         self.buttons = tk.Frame(self)
         self.buttons.pack(side=tk.BOTTOM, pady=(20, 30))
-        self.exit_button = self.endbutton = tk.Button(self.buttons, text="Home Screen", bg="#A020F0", font=("Terminal", 14), command=lambda: self.back_to_home())
+        self.exit_button = self.endbutton = tk.Button(self.buttons, text="Home Screen", bg="#A020F0", font=("Terminal", 34), command=lambda: self.back_to_home())
         self.exit_button.pack(side=tk.BOTTOM, fill=tk.X)
 
     def back_to_home(self):
@@ -28,13 +28,13 @@ class Results(tk.Frame):
         self.controller.show_page("HomePage")
 
     def update_labels(self):
-        self.mode_label.config(text=self.stats["mode"])
+        self.mode_label.config(text="MODE: " + self.stats["mode"])
         self.mode_label.pack()
         self.p1_score_label.config(text="P1 Score : " + str(int(self.stats["p1_score"])))
         self.p1_score_label.pack()
         if self.stats["mode"] == "battle":
             self.p2_score_label.config(text="P2 Score : " + str(int(self.stats["p2_score"])))            
-            self.p2_score_label.pack()
+            self.p2_score_label.pack(fill=tk.X, expand=True)
 
     def load_stats(self, stats):
         self.stats = stats
