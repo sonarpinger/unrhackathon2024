@@ -133,6 +133,8 @@ class Practice(tk.Frame):
         self.dance = dance
 
     def begin_practice(self):
+        if self.continue_looping:
+            return
         self.controller.stop_music()
         self.continue_looping = True
         self.players = [

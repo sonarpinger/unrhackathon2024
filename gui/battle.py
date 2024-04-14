@@ -140,6 +140,8 @@ class Battle(tk.Frame):
                 self.dances.append(Choreography.get_chor_from_chors(key, dances))
 
     def begin_battle(self):
+        if self.continue_looping:
+            return
         self.continue_looping = True
         self.players = [
             {
