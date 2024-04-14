@@ -315,8 +315,7 @@ class Practice(tk.Frame):
 
     def back_to_home(self):
         self.continue_looping = False
-        # reset when leaving menu
-        self.cleanup()
+        self.controller.play_menu_music()
         self.controller.show_page("HomePage")
 
     def cleanup(self):

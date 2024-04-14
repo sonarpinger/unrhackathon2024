@@ -48,6 +48,7 @@ class MainMenu(tk.Tk):
             page.tkraise()
 
     def show_dance(self, dance_name):
+        self.stop_music()
         page = self.pages.get("Practice")
         if page:
             page.tkraise()
@@ -70,6 +71,9 @@ class MainMenu(tk.Tk):
     def load_and_play_music(self, music_path):
         pygame.mixer.music.load(music_path)
         pygame.mixer.music.play(-1)
+    
+    def play_menu_music(self):
+        self.load_and_play_music("./data/sound/hackathonmenu.mp3")
     
     def stop_music(self):
         pygame.mixer.music.stop()

@@ -17,6 +17,7 @@ class Battle(tk.Frame):
         super().__init__(parent)
         self.controller = controller
         self.continue_looping = True
+        self.thread = None
 
         self.selection = {
             "dance-moves": False,
@@ -135,7 +136,8 @@ class Battle(tk.Frame):
                 "cd_message" : "Get ready Player 2!"
             }
         ]
-        threading.Thread(target=self.game_loop, daemon=True).start()
+        self.thread = threading.Thread(target=self.game_loop, daemon=True)
+        self.thread.start()
 
     def gui_update(self, frames):
         self.after(0, self.update_labels, frames)
@@ -143,7 +145,7 @@ class Battle(tk.Frame):
     def update_labels(self, frames):
         web_frame, vid_frame = frames
         web_frame = cv2.cvtColor(web_frame, cv2.COLOR_BGR2RGB)
-        web_frame = cv2.flip(web_frame, 1)
+        # web_frame = cv2.flip(web_frame, 1)
         web_frame = Image.fromarray(web_frame)
         web_frame = web_frame.resize((320, 240))
         img_tk = ImageTk.PhotoImage(image=web_frame)
@@ -167,134 +169,140 @@ class Battle(tk.Frame):
         self.countdown_bar_label.config(text=str(self.current_count))
 
     def game_loop(self):
-        quit = False
-        for dance in self.dances:
+        while self.continue_looping:
+            quit = False
+            for dance in self.dances:
 
-            print(f"On dance {dance.name}")
+                print(f"On dance {dance.name}")
 
-            # get dance data
-            threshold = dance.threshold
-            above_ratio = dance.above_ratio
-            below_ratio = dance.below_ratio
-            temporal_size = dance.temporal_size
-            sma_window = dance.sma_window
-            song_min_error = dance.min_error
-            song_max_error = dance.max_error
+                # get dance data
+                threshold = dance.threshold
+                above_ratio = dance.above_ratio
+                below_ratio = dance.below_ratio
+                temporal_size = dance.temporal_size
+                sma_window = dance.sma_window
+                song_min_error = dance.min_error
+                song_max_error = dance.max_error
 
-            keys_df = dance.df
-            video_frames = dance.video_frames
-            video_frames_right_bound = len(video_frames) - 1
+                keys_df = dance.df
+                video_frames = dance.video_frames
+                video_frames_right_bound = len(video_frames) - 1
 
-            for i, player in enumerate(self.players):
+                for i, player in enumerate(self.players):
 
-                print("On " + str(player["name"]))
+                    print("On " + str(player["name"]))
 
-                # init
-                last_score_time = time.time()
-                self.frame_counter = 0
+                    # init
+                    last_score_time = time.time()
+                    self.frame_counter = 0
 
-                # maybe try to incorporate this loading into the countdown
+                    # maybe try to incorporate this loading into the countdown
 
-                if self.flags["countdown"]:
-                    start_time = time.time()
+                    if self.flags["countdown"]:
+                        start_time = time.time()
+
+                        while self.cap.isOpened():
+                            ret, frame = self.cap.read()
+                            if not ret:
+                                break
+
+                            # calculate the time elapsed
+                            elapsed_time = time.time() - start_time
+                            
+                            # Update the countdown
+                            self.current_count = self.countdown - int(elapsed_time)
+                            if self.current_count < 0:
+                                # end countdown if reaches end time (less than 0)
+                                break
+                            
+                            # Put the countdown text on the frame
+                            cv2.putText(frame, str(self.current_count), (50, 50), self.font, 2, (255, 0, 0), 3, cv2.LINE_AA)
+
+                            # Display the resulting frame
+                            cv2.putText(frame, player["cd_message"], (50, 100), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
+                            # self.update_labels(frame, video_frames[self.frame_counter])
+                            self.gui_update((frame, video_frames[self.frame_counter]))
+
+                            # Break the loop with 'Q' key
+                            if cv2.waitKey(100) & 0xFF == ord('q'):
+                                break
+
+                    print("finished countdown")
 
                     while self.cap.isOpened():
                         ret, frame = self.cap.read()
                         if not ret:
                             break
 
-                        # calculate the time elapsed
-                        elapsed_time = time.time() - start_time
+                        frame = cv2.flip(frame, 1)
+
+                        # get keypoints and bounding box from model
+                        model_stuff = dch.run_model(frame, self.model)
+                        # get normalized body list by using camera frame size, model output, and standard body limb setup
+                        norm_body = pk.body_normalize(self.camera_stuff, model_stuff, self.body)
+                        # add horizontal flip of keypoints if on webcam
+                        if self.flags["hf"]:
+                            norm_body = pk.horizontal_body_flip(self.camera_stuff, norm_body)
+
+                        # temporal stuff for error detecting
+                        temporal_left_bound = self.frame_counter - temporal_size if self.frame_counter - temporal_size >= 0 else 0
+                        temporal_right_bound = self.frame_counter + temporal_size if self.frame_counter + temporal_size <= video_frames_right_bound else video_frames_right_bound
+                        temporal_frame_range = [temporal_left_bound, temporal_right_bound]
+                        current_source_body_index = (temporal_right_bound - temporal_left_bound) // 2
+                        # get source keypoints for comparison
+                        source_bodies_raw = dh.get_keypoints_from_df_range(keys_df, temporal_frame_range)
+                        # convert to usable keypoints
+                        source_bodies_usable = [dh.usable_keypoints_v2(keys) for keys in source_bodies_raw]
+                        # get error
+                        error = ed.min_temporal_pose_error(source_bodies_usable, norm_body, threshold, above_ratio, below_ratio)
+                        temp = self.error_over_time + [error]
+                        error_adjusted = ed.simple_moving_average(temp, sma_window)
+                        self.error_over_time.append(error_adjusted)
+
+                        # display on screen
+                        caption = f"Error: {error_adjusted}"
+                        source_frame = video_frames[self.frame_counter]
+
+                        # check score
+                        current_time = time.time()
+                        if current_time - last_score_time >= self.flags["score_timing"]:  # Check if one second has passed
+                            score = ed.error_to_score(song_min_error, song_max_error, error_adjusted)  # Run the function
+                            self.players[i]["score"] += score
+                            cv2.putText(source_frame, f"+{int(score)} points!", (250, 50), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                            last_score_time = current_time  # Reset the last run time
                         
-                        # Update the countdown
-                        self.current_count = self.countdown - int(elapsed_time)
-                        if self.current_count < 0:
-                            # end countdown if reaches end time (less than 0)
+                        if self.flags["limb_view"]:
+                            dch.add_limbs_to_frame(norm_body, self.camera_stuff["norm_box_0"], frame)
+                            dch.add_limbs_to_frame(source_bodies_usable[current_source_body_index], self.camera_stuff["norm_box_0"], source_frame)
+                            # vis_caption = f"visibility score: {dch.visibility_score(norm_body)}"
+                            # cv2.putText(source_frame, vis_caption, (200, 200), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
+
+                        # true display
+                        cv2.putText(source_frame, caption, (50, 100), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
+                        # self.update_labels(frame, source_frame)
+                        self.gui_update((frame, source_frame))
+
+                        #increment
+                        self.frame_counter += 1
+                        # self.frames.append(source_frame)
+
+                        # end if frame_counter reaches end
+                        if self.frame_counter >= video_frames_right_bound:
                             break
-                        
-                        # Put the countdown text on the frame
-                        cv2.putText(frame, str(self.current_count), (50, 50), self.font, 2, (255, 0, 0), 3, cv2.LINE_AA)
 
-                        # Display the resulting frame
-                        cv2.putText(frame, player["cd_message"], (50, 100), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
-                        # self.update_labels(frame, video_frames[self.frame_counter])
-                        self.gui_update((frame, video_frames[self.frame_counter]))
-
-                        # Break the loop with 'Q' key
-                        if cv2.waitKey(100) & 0xFF == ord('q'):
+                        # break loop if q
+                        if cv2.waitKey(10) & 0xFF == ord('q'):
+                            quit = True
                             break
-
-                print("finished countdown")
-
-                while self.cap.isOpened():
-                    ret, frame = self.cap.read()
-                    if not ret:
-                        break
-
-                    # get keypoints and bounding box from model
-                    model_stuff = dch.run_model(frame, self.model)
-                    # get normalized body list by using camera frame size, model output, and standard body limb setup
-                    norm_body = pk.body_normalize(self.camera_stuff, model_stuff, self.body)
-                    # add horizontal flip of keypoints if on webcam
-                    if self.flags["hf"]:
-                        norm_body = pk.horizontal_body_flip(self.camera_stuff, norm_body)
-
-                    # temporal stuff for error detecting
-                    temporal_left_bound = self.frame_counter - temporal_size if self.frame_counter - temporal_size >= 0 else 0
-                    temporal_right_bound = self.frame_counter + temporal_size if self.frame_counter + temporal_size <= video_frames_right_bound else video_frames_right_bound
-                    temporal_frame_range = [temporal_left_bound, temporal_right_bound]
-                    current_source_body_index = (temporal_right_bound - temporal_left_bound) // 2
-                    # get source keypoints for comparison
-                    source_bodies_raw = dh.get_keypoints_from_df_range(keys_df, temporal_frame_range)
-                    # convert to usable keypoints
-                    source_bodies_usable = [dh.usable_keypoints_v2(keys) for keys in source_bodies_raw]
-                    # get error
-                    error = ed.min_temporal_pose_error(source_bodies_usable, norm_body, threshold, above_ratio, below_ratio)
-                    temp = self.error_over_time + [error]
-                    error_adjusted = ed.simple_moving_average(temp, sma_window)
-                    self.error_over_time.append(error_adjusted)
-
-                    # display on screen
-                    caption = f"Error: {error_adjusted}"
-                    source_frame = video_frames[self.frame_counter]
-
-                    # check score
-                    current_time = time.time()
-                    if current_time - last_score_time >= self.flags["score_timing"]:  # Check if one second has passed
-                        score = ed.error_to_score(song_min_error, song_max_error, error_adjusted)  # Run the function
-                        self.players[i]["score"] += score
-                        cv2.putText(source_frame, f"+{int(score)} points!", (250, 50), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)
-                        last_score_time = current_time  # Reset the last run time
-                    
-                    if self.flags["limb_view"]:
-                        dch.add_limbs_to_frame(norm_body, self.camera_stuff["norm_box_0"], frame)
-                        dch.add_limbs_to_frame(source_bodies_usable[current_source_body_index], self.camera_stuff["norm_box_0"], source_frame)
-                        # vis_caption = f"visibility score: {dch.visibility_score(norm_body)}"
-                        # cv2.putText(source_frame, vis_caption, (200, 200), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
-
-                    # true display
-                    cv2.putText(source_frame, caption, (50, 100), self.font, 1, (0, 255, 0), 2, cv2.LINE_AA)  # Update text on the same frame
-                    # self.update_labels(frame, source_frame)
-                    self.gui_update((frame, source_frame))
-
-                    #increment
-                    self.frame_counter += 1
-                    # self.frames.append(source_frame)
-
-                    # end if frame_counter reaches end
-                    if self.frame_counter == video_frames_right_bound + 1:
-                        break
-
-                    # break loop if q
-                    if cv2.waitKey(10) & 0xFF == ord('q'):
-                        quit = True
+                        if not self.continue_looping:
+                            quit = True
+                            break
+                    if quit:
                         break
                 if quit:
                     break
-            if quit:
-                break
 
-        # go to results page?
+            # go to results page?
 
 
     def loop_pause(self):
@@ -306,6 +314,7 @@ class Battle(tk.Frame):
         self.continue_looping = False
         # reset when leaving menu
         self.cleanup()
+        self.controller.play_menu_music()
         self.controller.show_page("HomePage")
     
     def cleanup(self):
@@ -317,7 +326,12 @@ class Battle(tk.Frame):
             "orange-justice": False,
             "take-the-l": False,
         }
+        if self.thread is not None:
+            self.thread.join(timeout=2)
         self.dances.clear()
         for label in self.selection_labels:
             label.pack_forget()
         self.selection_labels.clear()
+        if hasattr(self, 'cap') and self.cap.isOpened():
+            self.cap.release()
+        cv2.destroyAllWindows()
