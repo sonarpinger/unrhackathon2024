@@ -81,8 +81,10 @@ class Practice(tk.Frame):
         # video display labels
         self.video_label = tk.Label(self)
         self.video_label.place(x=320, y=25, width=1440, height=960)
-        self.webcam_video_label = tk.Label(self)
-        self.webcam_video_label.place(x=320, y=25, width=320, height=240)
+        self.webcam_widget = tk.Frame(self)
+        self.webcam_widget.pack(side=tk.TOP, anchor=tk.NE, padx=10, pady=10)
+        self.webcam_video_label = tk.Label(self.webcam_widget)
+        self.webcam_video_label.pack()
 
         # game loop stuff
         self.flags = {
@@ -214,6 +216,8 @@ class Practice(tk.Frame):
                     if not ret:
                         break
 
+                    frame = cv2.flip(frame, 1) # for mirroring effect
+
                     # calculate the time elapsed
                     elapsed_time = time.time() - start_time
 
@@ -242,6 +246,8 @@ class Practice(tk.Frame):
                 ret, frame = self.cap.read()
                 if not ret:
                     break
+
+                frame = cv2.flip(frame, 1) # for mirroring effect
 
                 # get keypoints and bounding box from model
                 model_stuff = dch.run_model(frame, self.model)

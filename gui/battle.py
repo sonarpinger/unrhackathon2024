@@ -229,6 +229,8 @@ class Battle(tk.Frame):
                             if not ret:
                                 break
 
+                            frame = cv2.flip(frame, 1)
+
                             # calculate the time elapsed
                             elapsed_time = time.time() - start_time
                             
@@ -264,7 +266,7 @@ class Battle(tk.Frame):
                         if not ret:
                             break
 
-                        frame = cv2.flip(frame, 1)
+                        frame = cv2.flip(frame, 1) # for mirroring effect
 
                         # get keypoints and bounding box from model
                         model_stuff = dch.run_model(frame, self.model)
