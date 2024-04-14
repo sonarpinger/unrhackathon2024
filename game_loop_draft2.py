@@ -6,6 +6,7 @@
 import dance_comparison as dc
 import cv2
 import numpy as np
+from choreography import Choreography
 
 # same video (anthonyfloss) averages ~230
 # anthonyfloss test on orangejustice video averages ~300-350
@@ -17,24 +18,27 @@ import numpy as np
 # oj : 400
 # griddy : 241
 
-source_dance = "flossanthony"
+chor_fp = "./data/choreographies/chors.csv"
+source_dance = Choreography.get_chor_from_csv(chor_fp, name = "floss-new")
+# source_dance = Choreography(
+#     name = "floss-new",
+#     threshold = 0,
+#     above_ratio = 1.0,
+#     below_ratio = 0.5,
+#     temporal_size = 25,
+#     sma_window = 10,
+#     min_error = 50,
+#     max_error = 300,
+#     score_timing = 3,
+# )
 # test_dance = "./data/test_videos/flossanthony.mp4"
 test_dance = 0
-error_parameters = {
-    "threshold" : 0,
-    "above_ratio" : 1.0,
-    "below_ratio" : 0.5,
-    "temporal_size" : 25,
-    "sma_window" : 10, # equal to fps?
-    "min_error" : 50,
-    "max_error" : 300,
-    "score_timing" : 3,
-}
 flags = {
     "analytics" : True,
     "limb_view" : False,
     "data_printout" : False,
     "countdown" : True,
+    "score_timing" : 3,
 }
 
 def display_chart(image):
@@ -61,7 +65,7 @@ def display_frames(frames):
         if k == 27:  # If 'ESC' is pressed, break the loop
             break
 
-output = dc.dance_comparison(source_dance, test_dance, error_parameters, flags)
+output = dc.dance_comparison(source_dance, test_dance, flags)
 chart = output["chart"] # if output["chart"] else None 
 frames = output["frames"] # if output["frames"] else None
 errors = output["errors"]

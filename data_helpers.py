@@ -6,6 +6,7 @@
 import cv2
 import numpy as np
 import pandas as pd
+import csv 
 
 FRAME_RATE = 25
 
@@ -70,6 +71,12 @@ def load_csv_from_file(csv_file_path : str) -> pd.DataFrame:
         raise FileNotFoundError(f"No CSV file found at {csv_file_path}")
     except Exception as e:
         raise Exception(f"An error occurred while reading the CSV file: {str(e)}")
+
+def write_entries_to_csv(entries : list, csv_path : str):
+    with open(csv_path, 'a', newline='') as file:
+        writer = csv.writer(file)
+        for entry in entries:
+            writer.writerow(entry.to_csv())
 
 def get_keypoints_from_df(keypoint_df : pd.DataFrame, index : int) -> list:
     """

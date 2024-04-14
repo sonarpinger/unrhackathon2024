@@ -1,0 +1,7 @@
+name,threshold,above_ratio,below_ratio,temporal_size,sma_window,min_error,max_error,score_timing
+dance-moves,0,1.0,0.5,25,10,50,500,3
+floss-new,0,1.0,0.5,25,10,50,500,3
+gangnam-style,0,1.0,0.5,25,10,50,500,3
+get-griddy,0,1.0,0.5,25,10,50,500,3
+orange-justice,0,1.0,0.5,25,10,50,500,3
+take-the-l,0,1.0,0.5,25,10,50,500,3
