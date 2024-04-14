@@ -357,6 +357,10 @@ class Battle(tk.Frame):
         self.continue_looping = False
         # reset when leaving menu
         self.cleanup()
+        self.dances.clear()
+        for label in self.selection_labels:
+            label.pack_forget()
+        self.selection_labels.clear()
         self.controller.play_menu_music()
         self.controller.show_page("HomePage")
     
@@ -373,9 +377,5 @@ class Battle(tk.Frame):
         self.frame_counter = len(self.current_dance.video_frames) + 2
         # if self.thread is not None:
         #     self.thread.join(timeout=2)
-        self.dances.clear()
-        for label in self.selection_labels:
-            label.pack_forget()
-        self.selection_labels.clear()
         self.current_count = 3
-        cv2.destroyAllWindows()
+        # cv2.destroyAllWindows()
